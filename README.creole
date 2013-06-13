@@ -1,0 +1,26 @@
+==June 12th - Project Overview
+
+This is to be my first Retrochallenge attempt. Rather than try to create a serious retro project, I have decided to do
+a project for the sake of fun and learning.  My target retro platform for the challenge will be the Apple ][e Platinum
+edition machine that I purchased on Ebay last year.
+
+If I had had access to this Apple ][e when I was a kid with the slightly more extensive understanding of computers that
+I now have, what would my first project have been?  I would definitely have wanted to write programs for it but what
+language would I have wanted to use?  6502 assembly language of course!  Now there would have been the rub.  The
+computer comes with Applesoft BASIC but no nice symbolic assembler with a nice full screen editor.  I could have
+purchased such a set of 6502 assembly language development tools but I am a kid with no money but lots of free time
+so the obvious solution would have been to build my own.
+
+My Retrochallenge - 2013 Summer Challenge project will be to write a simple symbolic 6502 assembler in Applesoft
+BASIC.  The assembly language program to be assembled will be placed at the end of the assembler program as DATA
+statements.  This assembler can be used in the future to develop a full screen text editor.
+
+**My Challenge Goals:**
+* Have Fun.
+* Learn more about programming my Apple ][e.
+* Write a simple 6502 assembler in AppleSoft BASIC.
+* Actually write the code on my Apple ][e and only switch to an emulator if something should break on the real hardware
+  during the challenge timeframe.
+* Read 6502 assembly language source code from DATA statements appended to the end of the assembler program.
+* Output human readable listing output to the screen as part of the assembly process.
+* Output a BLOADable program to a ProDOS file.
