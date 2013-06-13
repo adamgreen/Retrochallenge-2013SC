@@ -4,6 +4,8 @@ This is to be my first Retrochallenge attempt. Rather than try to create a serio
 a project for the sake of fun and learning.  My target retro platform for the challenge will be the Apple ][e Platinum
 edition machine that I purchased on Ebay last year.
 
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-hardware.JPG}}
+
 If I had had access to this Apple ][e when I was a kid with the slightly more extensive understanding of computers that
 I now have, what would my first project have been?  I would definitely have wanted to write programs for it but what
 language would I have wanted to use?  6502 assembly language of course!  Now there would have been the rub.  The
