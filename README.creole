@@ -1,4 +1,4 @@
-==June 12th - Project Overview
+==June 12th, 2013 - Project Overview
 
 This is to be my first Retrochallenge attempt. Rather than try to create a serious retro project, I have decided to do
 a project for the sake of fun and learning.  My target retro platform for the challenge will be the Apple ][e Platinum
