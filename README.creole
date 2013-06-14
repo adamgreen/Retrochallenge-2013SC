@@ -9,9 +9,9 @@ back now :)
 
 ==June 12th, 2013 - Project Overview
 
-This is to be my first Retrochallenge attempt. Rather than try to create a serious retro project, I have decided to do
-a project for the sake of fun and learning.  My target retro platform for the challenge will be the Apple ][e Platinum
-edition machine that I purchased on Ebay last year.
+This is to be my first [[http://retrochallenge.net | Retrochallenge]] attempt. Rather than try to create a serious retro
+project, I have decided to do a project for the sake of fun and learning.  My target retro platform for the challenge
+will be the Apple ][e Platinum edition machine that I purchased on Ebay last year.
 
 {{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-hardware.JPG}}
 
@@ -22,9 +22,10 @@ computer comes with Applesoft BASIC but no nice symbolic assembler with a nice f
 purchased such a set of 6502 assembly language development tools but I am a kid with no money but lots of free time
 so the obvious solution would have been to build my own.
 
-My Retrochallenge - 2013 Summer Challenge project will be to write a simple symbolic 6502 assembler in Applesoft
-BASIC.  The assembly language program to be assembled will be placed at the end of the assembler program as DATA
-statements.  This assembler can be used in the future to develop a full screen text editor.
+My [[http://www.wickensonline.co.uk/retrochallenge-2012sc/ | Retrochallenge - 2013 Summer Challenge]] project will be to
+write a simple symbolic 6502 assembler in Applesoft BASIC.  The assembly language program to be assembled will be placed
+at the end of the assembler program as DATA statements.  This assembler can be used in the future to develop a full
+screen text editor.
 
 **My Challenge Goals:**
 * Have Fun.
