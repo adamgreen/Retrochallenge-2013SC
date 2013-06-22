@@ -1,0 +1,88 @@
+==Apple IIc Serial Cable Construction
+I wanted to use ADTPro with an Apple IIc but the cable I created for my Apple IIe wasn't compatible.  The Apple IIe used
+a DB-25 connector for the SSC card and the Apple IIc uses a 5-pin DIN connector, similar to MIDI.
+
+==Bill of Materials
+I went to my local Radio Shack to pick up the following parts to construct my own cable.  I could have purchased a
+pre-made cable [[http://retrofloppy.com/products.html | here]] but that would have taken me longer and deprived me of
+the enjoyment of making the cable for myself.
+
+|= RS Part Number                                                              |= Description |
+| [[http://www.radioshack.com/product/index.jsp?productId=2103840 | 42-2151]]  | Shielded 6-FT MIDI/DIN Cable |
+| [[http://www.radioshack.com/product/index.jsp?productId=2103806 | 276-1428]] | 9 Position Female D-Sub Connector |
+| [[http://www.radioshack.com/product/index.jsp?productId=2103993 | 276-1539]] | D-Sub Connector Hood |
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-01.jpg}}
+
+==Construction
+===Prepare MIDI Cable
+* I cut the MIDI cable in half.  I only needed one half of the cable for this project so I stored the other half for a
+  future project.
+* I then used an Exacto knife to remove the outer sheaf of the MIDI cable.
+* There are four coloured wires and a single bare wire exposed once the sheaf is removed.  I used the continuity setting
+on my multimeter to trace the pins of the male 5-pin DIN connector to these various coloured wires.  I arrived at this
+mapping for my particular cable:
+|= Colour |= Pin |= Signal |
+| Black | 1 | Data Terminal Ready |
+| Yellow | 2 | Transmit Data |
+| Bare | 3 | Ground |
+| White | 4 | Receive Data |
+| Red | 5 | Data Set Ready |
+
+//These pin numberings and signal descriptions come from
+[[http://support.apple.com/kb/TA30794?viewlocale=en_US | this Apple page.]]//
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-02.jpg}}
+
+* I stripped a few mm of insulation from each of the coloured wires in the MIDI cable and then tinned them with solder
+to make sure they didn't unravel as I prepared the crimps.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-03.jpg}}
+
+===Prepare DB-9 Crimp Pins
+* I started by tinning 8 of the crimp pins with solder.  The ninth pin is left unconnected since it represents the
+  Ring Indicator, an unused signal.
+* Twisted the red and black wires (pins 1 and 5 - DTR & DSR) of the MIDI cable together.  I then soldered them together
+  and covered with heat shrink tubing.
+* Soldered the yellow, bare, and yellow wires (pins 2, 3, and 4 - Tx, GND, Rx) of the MIDI cable to crimp pins.
+* Soldered 5 short pieces of wire to another 5 crimp pins.  These will be wired together later.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-04.jpg}}
+
+===Complete Wiring of DB-9 Serial Connector
+The connections that need to be made can be found in 
+[[http://adtpro.sourceforge.net/connectionsserial.html#DIN5 | this ADTPro documentation]].
+
+|= DIN-5 Pin |= MIDI Wire  |= DB-9 Pin             |= Signal Name                |= Notes |
+| 1 & 5      | Black & Red | Not Connected to DB-9 | DTR & DSR                   | Connect these DIN-5 pins together |
+| 2          | Yellow      | 2                     | Rx on PC and Tx on Apple ][ | |
+| 3          | Bare        | 5                     | GND                         | |
+| 4          | White       | 3                     | Tx on PC and Rx on Apple ][ | |
+|            |             | 1, 4, & 6             | DCD, DTR, & DSR             | Connect these DB-9 pins together |
+|            |             | 7 & 8                 | RTS & CTS                   | Connect these DB-9 pins together |
+
+The holes in the DB-9 connector are numbered from 1 to 9.  I used this numbering to insert the correct crimp pins in the
+connector from the back (black plastic) side of the connector.
+
+* Pushed the pin with the bare GND wire from the MIDI cable into hole 5.
+* Pushed the pin with the yellow wire into hole 2.  This connects the Transmit Data signal from the Apple IIc to the
+  Receive Data signal of the PC running ADTPro.
+* Pushed the pin with the white wire into hole 3.  This connects the Receive Data signal from the Apple IIc to the
+  Transmit Data signal of the PC running ADTPro.
+* Pushed the other 5 pins with short pieces of wire into holes 1, 4, 6, 7, and 8.
+* Pushed a final pin with no wire connected into hole 9.  This Ring Indicator signal isn't need for this cable.
+* Needed to connect the wires for holes 1, 4, and 6 (DCD, DTR, DSR) together.  Cut these wires to a convenient length
+  for bringing together inside of the DB-9 connector, stripped the insulation, twisted, and soldered together.  Covered
+  in heat shrink tubing.
+* Needed to connect the wires for holes 7 and 8 (RTS, CTS) together.  Cut these wires to a convenient length for
+  bringing together inside of the DB-9 connector, stripped the insulation, twisted, and soldered together.  Covered in
+  heat shrink tubing.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-05.jpg}}
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-06.jpg}}
+
+My final step was to double check that the correct pin of the DIN connector was mapped to the correct DB-9 pin using the
+continuity setting on my multi-meter.  Once that was complete, I attached the strain relief clamp (part of the hardware
+shipped with the DB-9 hood) to the cable, and then screwed the connector together to produce the final cable.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-07.jpg}}
