@@ -1,3 +1,15 @@
+==June 22nd, 2013 - Getting into the Retro Frame of Mind
+
+I figured it was time to get prepared for the Retrochallenge by getting into the right frame of mind.  To that end, I
+decided to get an Apple IIc working with [[http://adtpro.sourceforge.net | ADTPro]].  I had previously constructed a
+serial cable that worked with my Apple IIe but the Apple IIc has a different connector so I built a new one for it and
+then successfully connected ADTPro.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/apple2c-serial-08.jpg}}
+
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/apple2c-serial.creole#apple-iic-serial-cable-construction | Read more...]]
+
+
 ==June 14th, 2013 - No Turning Back Now
 
 This project has made it onto the 
