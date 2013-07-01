@@ -1,3 +1,24 @@
+==July 1st, 2013 - The Challenge has Begun!
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-setup.jpg}}
+
+Today is the first day of the Retrochallenge and I kicked it off by starting to prepare myself for writing some
+Applesoft BASIC code on my Aplle ][e.  This preparation included:
+* Putting my Apple 5.25" Disk Drive back together.  I took it apart last year after purchasing it on Ebay to clean and
+  calibrate it.  I never bothered putting all of the screws back into the drive case until today.  A year later, I can
+  say that I have finally completed that project :)
+* Connected my Apple ][e up to my Dell 2001FP LCD monitor via the composite input.  Previously I had the Apple ][
+  connected to an older CRT Televison.  The 80 column text looks great when connected to this Dell LCD.  That will make
+  coding on the actual Apple ][ hardware much easier on the eyes.
+* I made sure that ADTPro still worked between my Apple ][e and my MacBookAir.  I plan to use this to take snapshots of
+  the disk images as I progress on this challenge and commit them to this github repository.
+
+I will now spend the next couple of days rereading sections of 
+[[http://www.amazon.com/New-Apple-II-Users-Guide/dp/0615639879 | David Finnigan's "The New Apple II User's Guide"]]
+to reacquaint myself with Applesoft BASIC and ProDOS.  Once I am done with that reading, I can start sketching out the
+actual design of my 6502 assembler.
+
+
 ==June 22nd, 2013 - Getting into the Retro Frame of Mind
 
 I figured it was time to get prepared for the Retrochallenge by getting into the right frame of mind.  To that end, I
