@@ -1,3 +1,59 @@
+==July 2nd, 2013 - Applesoft BASIC, Here I Come!
+
+Yesterday was the first day that I really sat at the Apple IIe and typed in some code as I was attempting to learn
+Applesoft BASIC.  Using a non-structured line oriented BASIC on such a computer really took me back to my childhood.
+While I never owned an Apple II until 2012, the experience does remind me a lot of using my first computer, a Tandy
+Color Computer 2.
+
+I also experimented with copying sample disk images from my Apple IIe using [[http://adtpro.sourceforge.net | ADTPro]]
+and then extracting the Applesoft BASIC code on my MacBook using 
+[[http://applecommander.sourceforge.net | AppleCommander]].  This will allow me to not only commit .DSK images to this
+github repository but also the text of the Applesoft BASIC programs so that readers can look at it easily from the
+github site.  I just wish that AppleCommander would shutdown cleanly on my MacBook.  Instead it hangs on every shutdown
+attempt and I have to forcibly kill it.  These images show a screenshot from the Apple IIe where the code was originally
+written and then another screenshot of the same BASIC code being viewed in this github repository.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130702-01.jpg}} 
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130702-02.png}}
+
+I want to maintain a few tables (opcode and directive tables) in DATA statements while also placing the actual assembly
+language code to be assembled in DATA statements as well.  The issue I hit with this scenario is that I need to conduct
+multiple passes through the assembly code after having read out the tables.  While the RESTORE statement does allow the
+DATA pointer to be rewound, it would only rewind to the beginning of the tables and not the assembly language code.
+Reading through the Applesoft manual I discovered that there were pointers maintained by the interpreter so that it knew
+where the next READ should take place in the DATA stream.  It appears that I could save off these pointers after reading
+the tables:
+{{{
+2000 D1 =  PEEK(123):D2 =  PEEK(124)
+2010 D3 =  PEEK(125):D4 =  PEEK(126)
+}}}
+and then restore them to rewind to the same location:
+{{{
+2500  POKE 123,D1: POKE 124,D2: POKE 125,D3: POKE 126,D4
+}}}
+The sample I used to play around with this idea can be found 
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/01ee6f16e152f41343b3935019a99ac75bb295a0/files/DATA.BAS | here]]
+
+Why do I want to assembly language code to be included in the assembler source itself as DATA statements?  The main
+purpose of this project is to explore bootstrapping the development process on an Apple ][e, starting out with just the
+software that Apple shipped with the device.  I do admit that I am using one external program, ADTPro, in this project
+but it is just being used to facilitate sharing my progress on this site.  To keep with this goal of using only the code
+that Apple shipped on the machine, I don't have immediate access to a nice editor with which to write the assembly
+language source code.  However, the Apple ][e does provide some rudimentary editing options to be used in the creation
+of line numbered Applesoft programs.  Using DATA statements in the assembler code itself allows me to take advantage of
+this editing functionality and simplifies the read path in my BASIC code.
+
+I have already decided to make one early compromise to the assembler.  I had originally planned to allow for an ORG
+directive which would target the code to a specific load address.  The plan had been to create the machine language
+image in one memory location that was available when the BASIC program was running but BSAVE it out to a binary file
+with its address set to the specified ORG address.  I haven't found a convenient way to do this in Applesoft BASIC since
+it will set the address in the ProDOS directory entry to the one used with the BSAVE.   For now I will just assemble the
+code to a fixed address (reserved via the HIMEM statement) and this is the same location it will be placed to execute as
+well.  I can remedy this deficiency in the future through the use of machine language code to be called from the BASIC
+based assembler.
+
+
 ==July 1st, 2013 - The Challenge has Begun!
 
 {{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-setup.jpg}}
