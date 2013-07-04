@@ -169,7 +169,7 @@ further down in this documentation.
 | [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#asc | ASC]]   | Place ASCII string into memory. |
 | [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#db  | DB]]    | Place byte values into memory. |
 | [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#ds  | DS]]    | Reserve storage space in memory. |
-| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#da  | DW]]    | Place 2-byte values into memory. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#dw  | DW]]    | Place 2-byte values into memory. |
 | [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#equ | EQU]]   | Assign value to symbol. |
 | [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#end | END]]   | Must be used on last line of code. |
 | [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#lst | LST]]   | Turns output listing on/off. |
