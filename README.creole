@@ -1,3 +1,12 @@
+==July 3rd, 2013 - What Should this Assembler Do?
+
+I spent time today thinking more about this assembler project and stripping down my
+[[https://github.com/adamgreen/snapNcrackle/blob/master/notes/snap.creole | snap assembler documentation]]
+to indicate what features I want from this Applesoft BASIC based version.
+
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole | Read more...]]
+
+
 ==July 2nd, 2013 - Applesoft BASIC, Here I Come!
 
 Yesterday was the first day that I really sat at the Apple IIe and typed in some code as I was attempting to learn
