@@ -1,0 +1,376 @@
+==6502 Assembler
+
+What is this 6502 assembler project all about?  The basics are that it translates assembly language programs to 6502
+machine code.  What is this machine code stuff?  Machine code is really just a bunch of numbers that tell the 6502
+processor in the Apple II what to do.  While a human could write their code directly in machine code, it isn't the way I
+would like to spend my evenings.  There is actually a great book that teaches the reader exactly how to do that.  It is
+called
+[[http://www.amazon.com/exec/obidos/ASIN/0860207358/downandoutint-20 | "USBORNE INTRODUCTION TO MACHINE CODE FOR BEGINNERS" by Lisa Watts and Mike Wharton]].
+Thanks to the good old Internet, you can download it right now and start reading it by using this link:
+[[http://gomsx.net/hansotten/msxdocs/machinecodeforbeginners.pdf]].  My assembler project is really about writing an
+Applesoft BASIC program which will perform the conversions seen in this book to translate human readable 6502 mnemonics
+to machine code that the computer can understand.
+
+
+==What to support?
+
+I have recently written a 6502 assembler in C to run on modern machines.  I called it 
+[[https://github.com/adamgreen/snapNcrackle#readme | snap]] and it was written to be compatible enough with
+Glen Bredon's Merlin 8 assembler to build Jordan Mechner's Prince of Persia source code for the Apple II.  I plan to
+make my Applesoft BASIC assembler a subset of that snap assembler.  Rather than create a list of features for this new
+assembler from scratch, I have decided to speed things up by taking
+[[https://github.com/adamgreen/snapNcrackle/blob/master/notes/snap.creole | this snap documentation]] and modifying it
+to just maintain the core features required for my Applesoft assembler.
+
+So let's just jump in and start discussing the features that I want in this new assembler!
+
+
+== Source Lines
+The assembler will support lines of text as DATA statements appended to the BASIC sources for the assembler itself.
+By convention the assembly language sources to be assembled will start at line 32000, after the actual assembler source
+code and half way through the total Applesoft supported line count of 64000.
+
+What follows is an example source line which contains text for all of the supported fields:
+{{{
+32000 DATA "LABEL ADC $100,X ; The rest of the line is a comment"
+}}}
+
+* The supported fields are label, opcode, operand, and comment.
+* The fields are separated by one or more spaces.
+* The length of the source line is limited to the 255 characters supported by Applesoft for the whole DATA line.
+
+
+=== Label
+If there is any non-space character in the leftmost column other than or ';' then it and the subsequent text
+will be treated as a label.  //See the [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#comment | comment field description below]]
+to learn more about what ';' means when found in the leftmost location.//  The label field is an optional field.
+If you don't want to specify a label for a particular line of code, then just indent the code for the line with atleast
+one space character before specifying the opcode.
+
+Labels are used to symbolically identify the current line's output location in the machine language object file
+or to provide a symbolic name to **EQU** statements.
+
+Labels are case sensitive and can contain most printable characters but they can't start with a numeric digit
+('0' - '9').  This assembler will not place any limit on the length of the labels but shorter is better as it will use
+up less precious memory.
+
+All labels have global scope and therefore can only be assigned a value once.
+
+Examples:
+{{{
+32000 DATA "LABEL1 LDA #$FF"
+}}}
+In the above example, the **LDA** instruction would be located at address X and the symbol named, "LABEL1", would be
+assigned that address value.
+
+{{{
+32000 DATA "LABEL1"
+32010 DATA "        LDA #$FF"
+}}}
+The above example is the same as the previous one since a label on a line by itself refers to the address that will be
+used for the next generated image byte, in this case the address for the subsequent {{{LDA #$FF}}} instruction.
+
+{{{
+32000 DATA "THREE EQU 3"
+}}}
+In the above example, the **EQU** statement will assign the value of 3 to the symbol named, "THREE".
+
+{{{
+32010 DATA "        LDA THREE"
+}}}
+In the above example, the symbol named "THREE" is referenced in the operand field so that the address used for the
+**LDA** instruction is the value assigned to the symbol named "THREE" elsewhere in the source code.
+
+=== Opcode
+The opcode field is used to specify an assembly language instruction mnemonic or assembler directive.  All opcodes are
+case sensitive and must be uppercase.
+
+====Supported Instruction Mnemonics
+As my Apple IIe Platinum edition uses the enhanced 65c02 processor, it is the 65c02 instruction set that will be
+supported by this assembler.  You will find more information about the supported instructions in 65c02 device
+documentation and/or Apple II Technical Reference Manuals.
+
+These instruction mnemonics are case sensitive and must be uppercase.  Here is a summary of the instructions currently
+supported.
+
+| ADC | Add Memory to Accumulator with Carry |
+| AND | Logical AND Memory with Accumulator |
+| ASL | Shift Accumulator Left by 1 Bit |
+| BCC | Branch when Carry Clear |
+| BCS | Branch when Carry Set |
+| BEQ | Branch when Equal (zero flag set) |
+| BIT | Test Memory Bits with Accumulator |
+| BMI | Branch when Minus (negative flag set) |
+| BNE | Branch when Not Equal (zero flag not set) |
+| BPL | Branch when Plus (negative flag not set) |
+| BRA | Branch Always |
+| BRK | Software Breakpoint |
+| BVC | Branch when Overflow Clear |
+| BVS | Branch when Overflow Set |
+| CLC | Clear Carry Flag |
+| CLD | Clear Decimal Flag |
+| CLI | Clear Interrupt Disable Flag |
+| CLV | Clear Overflow Flag |
+| CMP | Compare Memory to Accumulator |
+| CPX | Compare Memory to X Register |
+| CPY | Compare Memory to Y Register |
+| DEC | Decrement Memory by 1 |
+| DEX | Decrement X Register by 1 |
+| DEY | Decrement Y Register by 1 |
+| EOR | Logical Exclusive OR Memory with Accumulator |
+| INC | Increment Memory by 1 |
+| INX | Increment X Register by 1 |
+| INY | Increment Y Register by 1 |
+| JMP | Jump to New Address |
+| JSR | Jump to New Address and Push Return Address To Stack |
+| LDA | Load Accumulator from Memory |
+| LDX | Load X Register from Memory |
+| LDY | Load Y Register from Memory |
+| LSR | Shift Accumulator Right by 1 Bit |
+| NOP | No Operation |
+| ORA | Logical OR Memory with Accumulator |
+| PHA | Push Accumulator on Stack |
+| PHP | Push Processor Status on Stack |
+| PHX | Push X Register on Stack |
+| PHY | Push Y Register on Stack |
+| PLA | Pull Accumulator from Stack |
+| PLP | Pull Processor Status from Stack |
+| PLX | Pull X Register from Stack |
+| PLY | Pull Y Register from Stack |
+| ROL | Rotate Accumulator Left by 1 Bit |
+| ROR | Rotate Accumulator Right by 1 Bit |
+| RTI | Return from Interrupt Handler |
+| RTS | Return from Subroutine |
+| SBC | Subtract Memory from Accumulator with Borrow |
+| SEC | Set Carry Flag |
+| SED | Set Decimal Flag |
+| SEI | Set Interrupt Disable Flag |
+| STA | Store Accumulator to Memory |
+| STX | Store X Register to Memory |
+| STY | Store Y Register to Memory |
+| STZ | Store Zero in Memory |
+| TAX | Transfer Accumulator to X Register |
+| TAY | Transfer Accumulator to Y Register |
+| TRB | Test and Reset Memory Bits with Accumulator |
+| TSB | Test and Set Memory Bits with Accumulator |
+| TSX | Transfer Stack Pointer to X Register |
+| TXA | Transfer X Register to Accumulator |
+| TXS | Transfer X Register to Stack Pointer |
+| TYA | Transfer Y Register to Stack Pointer |
+
+====Assembler Directives
+Directives only have meaning to the assembler and provide it with commands outside of the 65c02 device's instruction set.
+This would include directives that reserve space in memory for variables (ie: **DS** directive).  Directives are case
+sensitive and must be uppercase.
+
+This is a list of the currently supported assembler directives which will be described in more detail in sections found
+further down in this documentation.
+
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#asc | ASC]]   | Place ASCII string into memory. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#db  | DB]]    | Place byte values into memory. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#ds  | DS]]    | Reserve storage space in memory. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#da  | DW]]    | Place 2-byte values into memory. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#equ | EQU]]   | Assign value to symbol. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#end | END]]   | Must be used on last line of code. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#lst | LST]]   | Turns output listing on/off. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#sav | SAV]]   | Save output image to specified file. |
+| [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#tst | TST]]   | Turns unit test mode on. |
+
+=== Operand
+The required contents of the operand field will depend on the opcode used.  They will typically be addresses or 
+expressions.
+
+==== Expressions in Operands
+An expression is used in the operand field to specify 16-bit unsigned values as required by the opcode.  There should be
+no spaces placed within an expression.
+
+=====Immediate Expressions
+If the expression starts with a pound sign, '#', then the expression should treat the result of the rest of the
+expression text as a literal value and not an address.
+
+The following modifiers can be used immediately to the right of the '#' character to extract a particular 8-bit value
+from a 16-bit expression.
+| {{{<}}} | Use lower 8-bits of the 16-bit expression value. |
+| {{{>}}} | Use upper 8-bits of the 16-bit expression value. |
+
+Examples:
+{{{
+32000 DATA "EXAMPLE1 EQU #1         ; EXAMPLE1 is given a value of 1."
+32010 DATA "EXAMPLE2 EQU #<$4321    ; EXAMPLE2 is given a value of $21."
+32020 DATA "EXAMPLE3 EQU #>$4321    : EXAMPLE3 is given a value of $43."
+}}}
+
+=====Numbers in expressions
+There are multiple ways to specify numbers within an expression.
+
+|= Prefix  |= Meaning    |= Example |
+| //None// | Decimal     | 10 - is the value 10 in decimal. |
+| {{{$}}}  | Hexadecimal | $12 - equivalent to 0x12 or 18. |
+
+The name of a label can also be specified in an expression to have the assembler lookup the value for that label and use
+it within the expression.  In many cases, these can even be forward references to labels that haven't been defined yet.
+
+=====Operators in Expressions
+This is a minimal assembler and as such it won't support any operators.  At least not in the initial version.
+
+==== Addresses as Operands
+The 65c02 instruction opcodes support various addressing modes and they can be specified as follows:
+
+|= Address Type                              |= Format                                        |= Example |
+| Implied                                    | //No operand//                                 | {{{txa}}} |
+| Accumulator                                | //No operand//                                 | {{{asl}}} |
+| Immediate                                  | **immediate_expression**                       | {{{adc #1}}} |
+| Absolute                                   | **expression**                                 | {{{adc $1234}}} |
+| Zero Page                                  | **8bit_expression**                            | {{{adc $ff}}} |
+| Absolute Indexed                           | **expression**,x or **expression**,y           | {{{adc $1234,x}}} |
+| Zero Page Indexed                          | **8bit_expression**,x or **8bit_expression**,y | {{{adc $80,x}}} |
+| Relative                                   | **expression**                                 | {{{beq label}}} |
+| Zero Page Indexed Indirect                 | (**8bit_expression**,x)                        | {{{adc ($80,x)}}} |
+| Absolute Indexed Indirect                  | (**expression**,x)                             | {{{jmp ($100,x)}}} |
+| Indirect Indexed                           | (**8bit_expression**),y                        | {{{adc ($80),y}}} |
+| Zero Page Indirect                         | (**8bit_expression**)                          | {{{adc ($80)}}} |
+| Absolute Indirect                          | (**expression**)                               | {{{jmp ($100)}}} |
+
+Where:\\
+**immediate_expression** is any expression which starts with '#' as described above in Immediate Expressions.\\
+**expression** is any valid non-immediate expression.\\
+**8bit-expression** is any valid non-immediate expression which has a value of 255 or lower.\\
+
+=== Comment
+Any text on a source line following a semicolon, ';' is ignored and treated as a comment as in the following example:
+{{{
+32000 DATA "        INC ; 1 example of a comment."
+}}}
+
+Blank lines with no text are ignored by the assembler as well.
+
+Examples:
+{{{
+32000 DATA "; All 3 of these lines are"
+32010 DATA ""
+32020 DATA "; ignored by the assembler."
+}}}
+
+
+
+== Directives
+===EQU
+{{{symbolName EQU expression}}} \\
+
+Assigns an expression value to the symbol with the specified label name.
+* The **EQU** directive requires a line label.
+
+Example:
+{{{
+32000 DATA "ONE     EQU 1       ; Assign value of 1 to symbol named ONE."
+}}}
+
+===DS
+{{{ DS expression}}} \\
+
+Allocates and sets the specified number of bytes at the current address with zeroes.
+* The operand field must contain one expression.
+** This expression specifies the count of bytes to be allocated.
+** The back slash, '\', character can be used instead of an expression for this count value.  When used it indicates
+   that the rest of the 256 byte page should be allocated.  This means that the current address will be advanced to a
+   value which is an even multiple of 256.
+
+Examples:
+{{{
+32000 DATA "        DS 10   ; Fills the next 10 bytes with a value of 0."
+32010 DATA "        DS /    ; Will fill up the rest of the 256 byte page with a value of 0."
+}}}
+
+===DB
+{{{ DB 8bitExpression[,8bitExpression]...}}} \\
+
+Inserted the specified bytes into the output image.
+* An operand field is required.
+* The operand field contains a comma separated list of 8-bit expressions to be inserted into the memory image.
+
+Example:
+{{{
+32000 DATA "        DB 3,1  ; Inserts the values 3 and 1 into the output image."
+}}}
+
+===DW
+{{{ DW expression[,expression]...}}} \\
+
+Inserts the specified 16-bit words or addresses into the output image.
+* An operand field is required.
+* The operand field contains a comma separated list of 16-bit expressions to be inserted into the memory image.
+* The 16-bit value is inserted in little endian order.
+
+Example:
+{{{
+32000 DATA "        DA $FF00,$FF01  ; Inserts the values $FF00 and $FF01 into the output image."
+}}}
+
+===ASC
+{{{ ASC 'text'}}} \\
+
+Inserts the specified ASCII text into the output image.
+* An operand containing a delimited string is required.
+* Use of the single quote as delimiter will set the high bit of each ASCII character to 0.
+
+Example:
+{{{
+32000 DATA "        ASC 'Sample string'"
+}}}
+
+===SAV
+{{{ SAV binaryPathname}}} \\
+
+Instructs the assembler to write out the image data to the specified binary file.  A source file will typically contain
+one of these directives toward its end.  Without it, the output of the assembly will not be saved to disk.
+
+The binary file created by this directive will be BRUNable on the Apple II.
+
+Example:
+{{{
+32000 DATA "        LDA #1"
+32010 DATA "        RTS"
+32020 DATA "        SAV EXAMPLE2.BIN    ; Saves code meant for address $9000 into EXAMPLE2 object file."
+}}}
+
+===END
+{{{ END}}} \\
+
+Placed on the last line of the assembly language source code to tell the assembler that this is the last line of the
+source file.  Its use is required for this assembler.
+
+Example:
+{{{
+32000 DATA "        LDA #1"
+32010 DATA "        RTS"
+32020 DATA "        SAV EXAMPLE2.BIN"
+32030 DATA "        END"
+}}}
+
+===LST
+{{{ LST ON}}} \\
+{{{ -- or --}}} \\
+{{{ LST OFF}}} \\
+
+Tells the assembler whether it should display the listing output on the screen.  Listing output can slow down the
+assembly process so turning it off might be desirable.  The default setting is to generate listing output for every line
+of the assembly source code.
+* An operand of ON or OFF is required.
+** ON indicates that this line and subsequent lines should generate listing output to the screen.
+** OFF indicates that this line and subsequent lines should suspend generation of listing output to the screen.
+
+Example:
+{{{
+32000 DATA "        LST OFF"
+32010 DATA "        DB $5A ; This line will not be listed."
+32020 DATA "        LST ON"
+32030 DATA "        DB $A5 ; This line will be listed."
+}}}
+
+===TST
+{{{ TST}}} \\
+
+This is for unit testing only.  If the TST directive is located towards the top of the source file then unit testing
+mode will be enabled.  This unit testing mode will parse comments to determine if it only contains spaces and valid
+hexadecimal digits.  If they do contain hexadecimal values then the hexadecimal values indicate the expected object file
+output.  An error will be thrown on mismatch.
