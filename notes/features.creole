@@ -50,9 +50,9 @@ one space character before specifying the opcode.
 Labels are used to symbolically identify the current line's output location in the machine language object file
 or to provide a symbolic name to **EQU** statements.
 
-Labels are case sensitive and can contain most printable characters but they can't start with a numeric digit
-('0' - '9').  This assembler will not place any limit on the length of the labels but shorter is better as it will use
-up less precious memory.
+Labels are case sensitive and can contain most printable characters but they should't start with a numeric digit
+('0' - '9'), or dollar sign ($).  This assembler will not place any limit on the length of the labels
+but shorter is better as it will use up less precious memory.
 
 All labels have global scope and therefore can only be assigned a value once.
 
@@ -312,10 +312,14 @@ Example:
 Inserts the specified ASCII text into the output image.
 * An operand containing a delimited string is required.
 * Use of the single quote as delimiter will set the high bit of each ASCII character to 0.
+* Currently no spaces can be contained within the text.  A separate **DB $20** source line can be used to insert a space
+  character instead.
 
 Example:
 {{{
-32000 DATA "        ASC 'Sample string'"
+32000 DATA "        ASC 'Sample'"
+32010 DATA "        DB $20"
+32020 DATA "        ASC 'string'"
 }}}
 
 ===SAV
