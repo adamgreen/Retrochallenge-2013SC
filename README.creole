@@ -1,3 +1,16 @@
+==July 4th, 2013 - Pseudo What?
+
+When writing unstructured line numbered BASIC code, I have found that it helps to have a pretty good idea of what I am
+going to write before I even start typing at the keyboard.  It is difficult to move code around with the line number
+oriented editing provided by environments like Applesoft BASIC.  To alleviate this in the past I would have thought
+through a lot of the code on paper before starting to bang it out on the actual computer.  However with today's full
+screen editors, it is much easier to write the pseudo code on a modern PC instead.  It also makes it easier to share the
+pseudo code with people here on github.  Speaking of which, you can peruse my 
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/pseudocode.creole | current rough pseudo code here]].
+If that pseudo code happens to resemble C, its only because that is how my demented mind works these days :)  I hope to
+finish this pseudo code tomorrow and then start with the Applesoft coding.
+
+
 ==July 3rd, 2013 - What Should this Assembler Do?
 
 I spent time today thinking more about this assembler project and stripping down my
