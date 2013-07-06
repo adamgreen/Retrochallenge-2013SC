@@ -86,6 +86,7 @@ main()
 {
     init();
     openSource();
+    PRINT "ASSEMBLY STARTED" // Includes newline to prepare for upcoming DOS calls.
     pass = 1;
     runPass();
     rewindSource();
@@ -98,15 +99,14 @@ main()
 init()
 {
     CLEAR   // Tell BASIC to discard all variables.
+    SPEED=255 // Make listing output as fast as possible.
+    TEXT      // Make sure that we are in text mode.
+    PRINT: PRINT CHR$(4);"PR#3" : HOME // Switch to 80 Column Mode.
     reserveMemoryForMachineCode();
     initVariables();
     initArrays();
     countOpcodeTableEntries();
     saveSourceDataLocations();
-    SPEED=255 // Make listing output as fast as possible.
-    TEXT      // Make sure that we are in text mode.
-    PRINT: PRINT D$;"PR#3" : HOME // Switch to 80 Column Mode.
-    PRINT "ASSEMBLY STARTED" // Includes newline to prepare for upcoming DOS calls.
 }
 
 reserveMemoryForMachineCode()
@@ -123,7 +123,7 @@ reserveMemoryForMachineCode()
         STOP
     }
     
-    HIMEM: = machineCodeStart;
+    HIMEM: machineCodeStart;
 }
 
 uint16_t getHIMEM()
@@ -228,8 +228,6 @@ countOpcodeTableEntries()
             break;
         directiveCount++;
     }
-    
-    PRINT D$;"FRE(0)" // Free unused strings.
 }
 
 skipOpcodeData()
@@ -1211,8 +1209,32 @@ closeSource()
 cleanup()
 {
     CLEAR   // Tell BASIC to discard all variables.
-    HIMEM: = expectedHiMem;
+    HIMEM: expectedHiMem;
 }
 
 
 }}}
+
+|= BASIC Line |= Functions Implemented |= Notes |
+| 1500 | main | |
+| 2000 | init, reserveMemoryForMachineCode, getHIMEM, getEndOfVariablePointer, initVariables, initArrays, countOpcodeTableEntries, saveSourceDataLocations | |
+| 2200 | skipOpcodeData | |
+| 2300 | getCurrentDataLocations | |
+| 2400 | openSource | |
+
+
+
+|= BASIC Name |= Pseudo Name |= Notes |
+| A% | instructionCount | |
+| B% | directiveCount | |
+| D1% | dataLineLo | |
+| D2% | dataLineHi | |
+| D3% | dataPtrLo | |
+| D4% | dataPtrHi | |
+| S1% | sourceDataLineLo | |
+| S2% | sourceDataLineHi | |
+| S3% | sourcePtrLo | |
+| S4% | sourcePtrHi | |
+| I | i | |
+| T$ | testString1 | |
+
