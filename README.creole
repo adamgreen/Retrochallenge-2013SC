@@ -1,3 +1,10 @@
+==July 5th, 2013 - Prepared for Coding.
+I completed my pseudocoding exercise today by adding support for directives, list output generation, and unit
+test mode.  I should be able to start actual implementation in Applesoft BASIC this weekend.
+
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/pseudocode.creole | Read more...]]
+
+
 ==July 4th, 2013 - Pseudo What?
 
 When writing unstructured line numbered BASIC code, I have found that it helps to have a pretty good idea of what I am
