@@ -1,4 +1,4 @@
-==July 5th, 2013 - Prepared for Coding.
+==July 5th, 2013 - Prepared for Coding
 I completed my pseudocoding exercise today by adding support for directives, list output generation, and unit
 test mode.  I should be able to start actual implementation in Applesoft BASIC this weekend.
 
