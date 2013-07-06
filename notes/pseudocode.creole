@@ -1,14 +1,15 @@
 == Pseudo Code
-What follows is my current C-like pseudo code for the simple 6502 assembler.  It is a work in progress.
+What follows is the current pseudo code for my simple 6502 assembler.  It is a work in progress!
 
 
 {{{
 // Constants
 const uint16_t expectedHiMem = 0x9600;      // DOS should be located above this address.
 const uint16_t machineCodeStart = 0x7600;   // Assembled program will start at this address.
-const int16_t  maxMachineCodeSize = expectedHiMem - machineCodeStart;   // Must be multiple of 256 bytes (a page).
+const uint16_t maxMachineCodeSize = expectedHiMem - machineCodeStart;   // Must be multiple of 256 bytes (a page).
 const int16_t  opcodeCount = 14;            // The opcode table supports 14 addressing modes.
 const int16_t  maxLabelCount = 256;         // The maximum number of labels to support.
+const uint16_t equInvalid = 0x10000;
 const int16_t  immediate = 0;
 const int16_t  absolute = 1;
 const int16_t  zeropage = 2;
@@ -25,15 +26,15 @@ const int16_t  absoluteIndexedIndirect = 12;
 const int16_t  zeropageIndexedIndirect = 13;
 
 // Globals
-int16_t  pMachineCodeStart;
-int16_t  pMachineCodeCurr;
+uint16_t programCounter;
+uint16_t lineProgramCounter;
+uint16_t equValue;
 
 int16_t  listFlag;
 int16_t  testFlag;
 int16_t  instructionCount;
 int16_t  directiveCount;
 int16_t  pass;
-int16_t  programCounter;
 int16_t  found;
 int16_t  expressionValue;
 int16_t  dataLineLo;
@@ -60,6 +61,7 @@ int16_t  retInt1;
 int16_t  retInt2;
 
 string   D$;
+string   lineText;
 string   label;
 string   operator;
 string   operand;
@@ -116,28 +118,31 @@ reserveMemoryForMachineCode()
     }
     
     HIMEM: = machineCodeStart;
-    pMachineCodeCurr = machineCodeStart;
 }
 
-int16_t getHIMEM()
+uint16_t getHIMEM()
 {
     return (PEEK(0x74) << 8) | PEEK(0x73);
 }
 
-int16_t getEndOfVariablePointer()
+uint16_t getEndOfVariablePointer()
 {
     return (PEEK(0x6E) << 8) | PEEK(0x6D);
 }
 
 initVariables()
 {
-    // Initialize ints.
+    // Initialize floats.
+    programCounter = 0;
+    lineProgramCounter = 0;
+    equValue = equInvalid;
+
+    // Initialize integers.
     listFlag = 1;
     testFlag = 0;
     instructionCount = -1;
     directiveCount = -1;
     pass = 0;
-    programCounter = 0;
     found = 0;
     dataLineLo = 0;
     dataLineHi = 0;
@@ -162,6 +167,7 @@ initVariables()
     
     // Initialize strings.
     D$ = CHRS(4);
+    lineText = "";
     label = "";
     operator = "";
     operand = "";
@@ -265,8 +271,11 @@ fetchAndSplitNextLine()
     freeUnneededStrings();
     
     restoreDataLocations();
-    READ tempString1
+    READ lineText
     getCurrentDataLocations();
+    
+    lineProgramCounter = programCounter;
+    equValue = equInvalid;
     
     i = 0;
     extractNextField();
@@ -296,6 +305,7 @@ freeUnneededStrings()
 {
     tempString1 = "";
     tempString2 = "";
+    lineText = "";
     label = "";
     opcode = "";
     operand = "";
@@ -315,23 +325,23 @@ restoreDataLocations()
 extractNextField()
 {
     // Just return if we have already extracted all of the fields already.
-    if (i == LEN(tempString1))
+    if (i == LEN(lineText))
     {
         retInt1 = 1;
         return;
     }
     
     // Check for comment.
-    if (tempString1[i] == ';')
+    if (lineText[i] == ';')
     {
-        comment = MID$(tempString1, i);
+        comment = MID$(lineText, i);
         retInt1 = 1;
         return;
     }
     
     // Not comment so extract field.
     findNextWhitespace();
-    tempString2 = MID$(tempString1, i, j-i);
+    tempString2 = MID$(lineText, i, j-i);
     i = j;
     
     // Advance to start of next field.
@@ -345,9 +355,9 @@ extractNextField()
 findNextWhitespace()
 {
     j = i;
-    while (j < LEN(tempString1))
+    while (j < LEN(lineText))
     {
-        if (tempString1[j] == ' ')
+        if (lineText[j] == ' ')
             return;
         j++;
     }
@@ -356,9 +366,9 @@ findNextWhitespace()
 findNextNonWhitespace()
 {
     j = i;
-    while (j < LEN(tempString1))
+    while (j < LEN(lineText))
     {
-        if (tempString1[j] != ' ')
+        if (lineText[j] != ' ')
             return;
         j++;
     }
@@ -380,6 +390,8 @@ parseLine()
         printLineNumber();
         PRINT "*INVALID_OPCODE"
     }
+    if (listFlag)
+        generateListOutput();
 }
 
 createLabelSymbolIfNeeded()
@@ -975,6 +987,7 @@ handleEQU()
         return;
     }
     symbolValues[labelIndex] = expressionValue;
+    equValue = expressionValue;
 }
 
 handleLST()
@@ -998,6 +1011,86 @@ handleSAV()
 handleTST()
 {
     testFlag = 1;
+}
+
+generateListOutput()
+{
+    listLineNumber();
+    listAddress();
+    if (equValue != equInvalid)
+        listEquValueAndSource();
+    else
+        listMachineCodeAndSource();
+    PRINT
+}
+
+listLineNumber()
+{
+    tempString1 = STR$(dataLineHi*256 + dataLineLo);
+    PRINT TAB(5-LEN(tempString1));tempString1;": ";
+}
+
+listAddress()
+{
+    emitByte = lineProgramCounter / 256;
+    printHexByte();
+    emitByte = lineProgramCounter - (emitByte * 256);
+    printHexByte();
+}
+
+printHexByte()
+{
+    tempInt1 = emitByte / 16;
+    printHexNibble();
+    tempInt1 = emitByte - (tempInt1 * 16);
+    printHexNibble();
+}
+
+printHexNibble()
+{
+    if (tempInt1 < 10)
+        PRINT CHR$(ASC("0")+tempInt1);
+    else
+        PRINT CHR$(ASC("A")+tempIn1-10);
+}
+
+listEquValue()
+{
+    PRINT " =";
+    emitByte = equValue / 256;
+    printHexByte();
+    emitByte = equValue - (emitByte * 256);
+    printHexByte();
+    
+    listLineText();
+}
+
+listMachineCodeAndSource()
+{
+    for ( i = 0 ; i < programCounter - lineProgramCounter ; i++ )
+    {
+        if (i == 3)
+        {
+            lineTextList();
+        }
+        if ((i / 3) * 3 == i)
+        {
+            PRINT
+        }
+    
+        HTAB(11 + 3*(i - ((i / 3)*3)))
+        printHexByte();
+    }
+    
+    if (programCounter - lineProgramCounter > 3)
+    {
+        listLineText();
+    }
+}
+
+listLineText()
+{
+    PRINT TAB(22);"  ";lineText;
 }
 
 rewindSource()
