@@ -9,6 +9,9 @@ const uint16_t machineCodeStart = 0x7600;   // Assembled program will start at t
 const uint16_t maxMachineCodeSize = expectedHiMem - machineCodeStart;   // Must be multiple of 256 bytes (a page).
 const int16_t  opcodeCount = 14;            // The opcode table supports 14 addressing modes.
 const int16_t  maxLabelCount = 256;         // The maximum number of labels to support.
+const int16_t  testQueueStart = 0x300;      // Place unit test bytes in page 3.
+const int16_t  testQueueEnd = 0x3FF;
+const int16_t  testQueueSize = testQueueEnd - testQueueStart + 1;
 const uint16_t equInvalid = 0x10000;
 const int16_t  immediate = 0;
 const int16_t  absolute = 1;
@@ -45,9 +48,12 @@ int16_t  sourceDataLineLo;
 int16_t  sourceDataLineHi;
 int16_t  sourceDataPtrLo;
 int16_t  sourceDataPtrHi;
-int16_t  symbolIndex;
 int16_t  labelIndex;
+int16_t  symbolIndex;
 int16_t  symbolCount;
+int16_t  testQueueWrite;
+int16_t  testQueueRead;
+int16_t  testQueueCount;
 int16_t  openParen;
 int16_t  closeParen;
 int16_t  comma;
@@ -152,9 +158,12 @@ initVariables()
     sourceDataLineHi;
     sourceDataPtrLo;
     sourceDataPtrHi;
-    symbolIndex = -1;
     labelIndex = -1;
+    symbolIndex = -1;
     symbolCount = 0;
+    testQueueWrite = testQueueStart;
+    testQueueRead = testQueueStart;
+    testQueueCount = 0;
     openParen = -1;
     closeParen = -1;
     comma = -1;
@@ -381,6 +390,8 @@ printLineNumber()
 
 parseLine()
 {
+    if (testFlag)
+        parseCommentForTestBytes();
     createLabelSymbolIfNeeded();
     found = 0;
     parseAs65c02Instruction();
@@ -392,6 +403,67 @@ parseLine()
     }
     if (listFlag)
         generateListOutput();
+}
+
+parseCommentForTestBytes()
+{
+    doesCommentContainTestData();
+    if (!retInt1)
+        return;
+    queueUpTestBytes();
+}
+
+doesCommentContainTestData()
+{
+    for (i = 0 ; i < LEN(comment) ; i++)
+    {
+        j = ASC(MID$(comment, i, 1))
+        if (j != ASC(" ") && j < ASC("0") && j > ASC("9") && j < ASC("A") && j > ASC("F"))
+        {
+            retInt = 0;
+            return;
+        }
+    }
+    retInt = 1;
+}
+
+queueUpTestBytes()
+{
+    i = 0;
+    while (i < LEN(comment))
+    {
+        skipSpaces();
+        expression = MID$(comment, i, 2);
+        parseHexValue();
+        queueTestByte();
+        i += 2;
+    }
+}
+
+skipSpaces()
+{
+    while (i < LEN(comment))
+    {
+        if (comment[i] != ' ')
+            return;
+        i++;
+    }
+}
+
+queueTestByte()
+{
+    if (testQueueCount == testQueueSize)
+    {
+        printLineNumber();
+        PRINT "*TST_OVER"
+        STOP
+    }
+    
+    POKE testQueueWrite,expressionValue
+    testQueueWrite++;
+    if (testQueueWrite > testQueueEnd)
+        testQueueWrite = testQueueStart;
+    testQueueCount++;
 }
 
 createLabelSymbolIfNeeded()
@@ -563,6 +635,36 @@ emit1Byte()
     
     POKE programCounter, emitByte
     programCounter++;
+    
+    if (testFlag)
+        checkTestBytes();
+}
+
+checkTestBytes()
+{
+    dequeueTestByte();
+    if (tempInt1 != emitByte)
+    {
+        printLineNumber();
+        PRINT "*TST_FAIL"
+        STOP
+    }
+}
+
+dequeueTestByte()
+{
+    if (testQueueCount == 0)
+    {
+        printLineNumber();
+        PRINT "*TST_UNDER"
+        STOP
+    }
+    
+    tempInt1 = PEEK(testQueueRead)
+    testQueueRead++;
+    if (testQueueRead > testQueueEnd)
+        testQueueRead = testQueueStart;
+    testQueueCount--;
 }
 
 handleImmediate()
