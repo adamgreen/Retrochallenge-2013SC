@@ -1,3 +1,29 @@
+==July 6th, 2013 - Program Not Brought to you by the Letter J
+
+As I was writing actual BASIC code today, I hit a problem on my Apple IIe that I think has probably existed since I got the machine but I didn't notice it until now.  **The J key doesn't work!**  I can't believe that I have never tried to type a **J** until now.  I guess it isn't used much when writing BASIC code :)  I am continuing to work on the challenge with the broken key for now but at some point I will need access to the J key and at that time I will try to fix the key and switch to emulation if not successful.
+
+I reread Appendix D: Space Saver and Appendix E: Speeding Up Your Program of the "Applesoft II BASIC Programming Reference Manual".  When implementing the 65c02 assembler, my first priority is to minimize the size of the assembler since I think that it is going to be a bit on the large side and I still need to fit in DATA statements for the assembly language code to process.  The second priority will be to make speed optimizations, especially in the really hot code paths.  If I encounter a conflict between these two priorities as I implement the assembler, I will tend to side with the version of the code which minimizes size.  Based on these priorities, I have come up with this list of things (most come from the reference manual) to keep in mind as I write the code:
+* Placing multiple statements on one line saves 5 bytes of overhead per source line.
+* Minimize comment text.  I will create pages on github in an attempt to document the code else where and use a minimum
+  of comments.
+* Make use of variables instead of constants.  This item has a few things to consider though:
+** If using a constant (especially those with more than a couple of digits) multiple times then set a variable to the
+   value and use it instead.  This also makes things faster since the number doesn't need to be parsed each time.
+** If constant not used many times, it will probably grow code to add the extra assignment line but if used in loop then
+   might give speed boost from less parsing.
+* Use subroutines to remove redundancy from code.
+* One character variable names use less space than two character names.  While longer variable names are more meaningful
+  to reader, they take up more space in the code.  Again, I will try to use external documentation to provide the reader
+  (me in most cases) with an explanation for each short named variable.
+* Keep the assembly language code short and sweet as well.  Longer label names require more space.  Comments will use
+  more space.  Evening adding more spaces for cleaner formatting will use more space.
+* Sort variable in initialization routine so that hot loop variables like i, j, k, etc are at top since linear search is
+  used when references are made and they are arranged in init order.
+* Just use NEXT, instead of NEXT I.  This eliminates a runtime consistency check.
+* May want to place hot routines (code which is called often) closer to beginning of program. Don't place any code in
+  first 1000 lines at first so that hot routines can be moved into that area later.
+
+
 ==July 5th, 2013 - Prepared for Coding
 I completed my pseudocoding exercise today by adding support for directives, list output generation, and unit
 test mode.  I should be able to start actual implementation in Applesoft BASIC this weekend.
