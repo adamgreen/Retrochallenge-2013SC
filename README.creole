@@ -1,9 +1,37 @@
+==July 7th, 2013 - Progressing....
+
+This weekend, I started implementing the 65c02 assembler in Applesoft BASIC and it looks like I should have something
+ready to start testing in the next couple of days.
+
+I have committed my current work in progress:
+* The BASIC code can be seen 
+  [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/e1674b234111fd7cbcb1f8b06475524845422280/files/SASM.BAS | here]].
+* I have updated the pseudocode as I have been implementing the BASIC version.  The corresponding pseudocode is located
+  [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/e1674b234111fd7cbcb1f8b06475524845422280/notes/pseudocode.creole | here]].
+* To help me keep track of how the BASIC code corresponds to the pseudocode, I have created this
+  [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/e1674b234111fd7cbcb1f8b06475524845422280/notes/map.creole | mapping document]].
+  It maps BASIC line numbers and variable names to the more descriptive function and variable names used in the
+  pseudocode.
+
+
 ==July 6th, 2013 - Program Not Brought to you by the Letter J
 
-As I was writing actual BASIC code today, I hit a problem on my Apple IIe that I think has probably existed since I got the machine but I didn't notice it until now.  **The J key doesn't work!**  I can't believe that I have never tried to type a **J** until now.  I guess it isn't used much when writing BASIC code :)  I am continuing to work on the challenge with the broken key for now but at some point I will need access to the J key and at that time I will try to fix the key and switch to emulation if not successful.
+As I was writing actual BASIC code today, I hit a problem on my Apple IIe that I think has probably existed since I got
+the machine but I didn't notice it until now.  **The J key doesn't work!**  I can't believe that I have never tried to
+type a **J** until now.  I guess it isn't used much when writing BASIC code :)  I am continuing to work on the challenge
+with the broken key for now but at some point I will need access to the J key and at that time I will try to fix the key
+and switch to emulation if not successful.
 
-I reread Appendix D: Space Saver and Appendix E: Speeding Up Your Program of the "Applesoft II BASIC Programming Reference Manual".  When implementing the 65c02 assembler, my first priority is to minimize the size of the assembler since I think that it is going to be a bit on the large side and I still need to fit in DATA statements for the assembly language code to process.  The second priority will be to make speed optimizations, especially in the really hot code paths.  If I encounter a conflict between these two priorities as I implement the assembler, I will tend to side with the version of the code which minimizes size.  Based on these priorities, I have come up with this list of things (most come from the reference manual) to keep in mind as I write the code:
-* Placing multiple statements on one line saves 5 bytes of overhead per source line.
+I reread Appendix D: Space Saver and Appendix E: Speeding Up Your Program of the "Applesoft II BASIC Programming Reference Manual".
+When implementing the 65c02 assembler, my first priority is to minimize the size of the assembler since I think that it
+is going to be a bit on the large side and I still need to fit in DATA statements for the assembly language code to
+process.  The second priority will be to make speed optimizations, especially in the really hot code paths.  If I
+encounter a conflict between these two priorities as I implement the assembler, I will tend to side with the version of
+the code which minimizes size.  Based on these priorities, I have come up with this list of things (most come from the
+reference manual) to keep in mind as I write the code:
+* Placing multiple statements on one line saves 4 bytes of overhead per source line. **edit:** //I originally indicated
+  that it saves 5 bytes per source line but I later noticed that Beagle Brother's D Code documentation correctly points
+  out that the colon statement separator uses up one of the saved bytes.//
 * Minimize comment text.  I will create pages on github in an attempt to document the code else where and use a minimum
   of comments.
 * Make use of variables instead of constants.  This item has a few things to consider though:
