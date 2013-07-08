@@ -1,0 +1,98 @@
+== BASIC Line Number to Function Name Mapping
+|= BASIC Line |= Function Implemented |
+| 2000 | main |
+| 2100 | init |
+| 2200 | reserveMemoryForMachineCode |
+| 2300 | initVariables |
+| 2400 | countOpcodeTableEntries |
+| 2500 | skipOpcodeData |
+| 2600 | saveSourceDataLocations |
+| 2700 | getCurrentDataLocations |
+| 2800 | openSource |
+| 2900 | runPass |
+| 3000 | fetchAndSplitNextLine |
+| 3100 | freeUnneededStrings |
+| 3200 | restoreDataLocations |
+| 3300 | extractNextField |
+| 3400 | findNextWhitespace |
+| 3500 | findNextNonWhitespace |
+| 3600 | printLineNumber |
+| 3700 | parseLine |
+| 3800 | parseCommentForTestBytes |
+| 3900 | doesCommentContainTestData |
+| 4000 | queueUpTestBytes |
+| 4100 | skipSpaces |
+| 4200 | queueTestByte |
+| 4300 | createLabelSymbolIfNeeded |
+| 4400 | findSymbol |
+| 4500 | allocateSymbol |
+| 4600 | parseAs6502Instruction |
+| 4700 | matchOperatorTo65c02Instruction |
+| 4800 | fetchOpcodes |
+| 4900 | parseAddressAndEmitMachineCode |
+| 5000 | findParensAndComma |
+| 5100 | handleImplied |
+| 5200 | signalInvalidAddressingMode |
+| 5300 | emitMachineCode |
+| 5400 | emit1Byte |
+| 5500 | checkTestByte |
+| 5600 | dequeueTestByte |
+| 5700 | handleImmediate |
+| 5800 | signalExpressionError |
+| 5900 | parseExpression |
+| 6000 | parseHexValue |
+| 6100 | parseDecValue |
+| 6200 | parseSymbolName |
+| 30000 | STOP | Temp STOP |
+| 31000 | RETURN | Temp RETURN |
+
+
+== BASIC Variable Name to Pseudocode Name Mapping
+|= BASIC Name |= Pseudo Name |= Notes |
+| A | lineProgramCounter | X |
+| A% | lineLength | **renamed from L% |
+| A$ | lineText | X |
+| AI% | absoluteIndex | |
+| C$ | comments | X |
+| CM% | comma | |
+| CP% | closeParen | |
+| D$ | D$ | X |
+| D1% | dataLineLo | X |
+| D2% | dataLineHi | X |
+| D3% | dataPtrLo | X |
+| D4% | dataPtrHi | X |
+| DC% | directiveCount | **renamed from B% |
+| E | equValue | X |
+| E% | expressionValue | |
+| E$ | expression | X |
+| F% | found | |
+| I | i | X |
+| IC% | instructionCount | **renamed from A%** |
+| K | j | X My J key isn't working |
+| L$ | label | X |
+| LI% | labelIndex | X |
+| LF% | listFlag | X |
+| O% | opcodes | |
+| O$ | operator | X |
+| OP% | openParen | |
+| P | programCounter | X |
+| P% | pass | X |
+| P$ | operand | X |
+| R% | retInt | X |
+| S$ | symbolName | X |
+| S1% | sourceDataLineLo | X |
+| S2% | sourceDataLineHi | X |
+| S3% | sourcePtrLo | X |
+| S4% | sourcePtrHi | X |
+| SC% | symbolCount | X |
+| SI% | symbolIndex | X |
+| SN$ | symbolNames | X |
+| SV% | symbolValues | X |
+| TC% | testQueueCount | |
+| TR% | testQueueRead | |
+| TW% | testQueueWrite | |
+| T% | tempInt | |
+| T$ | tempString | X |
+| TF% | testFlag | X |
+| X% | emitByte | |
+| ZI% | zeropageIndex | |
