@@ -1,3 +1,16 @@
+==July 8th, 2013 - Successfully Assembled 1 Line of 6502 Code
+
+I hit a relatively major milestone today when I finished implementing the first revision of my simple 65c02 assembler in
+Applesoft BASIC and it successfully assembled its first line of 6502 assembly.  Yay!
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130708-01.jpg}}
+
+Now I need to write a more extensive set of tests to exercise more of the code and smash the bugs that will no doubt
+scurry out from within the dark recesses of my BASIC code :)
+
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/7d9b4769ac6ebff1c522c3d17e89baa8e9c7316f/files/SASM.BAS | Browse initial Applesoft source code...]]
+
+
 ==July 7th, 2013 - Progressing....
 
 This weekend, I started implementing the 65c02 assembler in Applesoft BASIC and it looks like I should have something
