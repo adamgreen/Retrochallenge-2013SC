@@ -184,7 +184,7 @@ countOpcodeTableEntries()
 
 skipOpcodeData()
 {
-    for (i = 0 ; i < opcodeCount ; i++)
+    for (j = 0 ; j < opcodeCount ; j++)
         READ tempInt
 }
 
@@ -338,7 +338,7 @@ printLineNumber()
 
 parseLine()
 {
-    if (testFlag)
+    if (testFlag && pass==2)
         parseCommentForTestBytes();
     createLabelSymbolIfNeeded();
     found = 0;
@@ -363,10 +363,10 @@ parseCommentForTestBytes()
 
 doesCommentContainTestData()
 {
-    for (i = 1 ; i <= LEN(comments) ; i++)
+    for (i = 2 ; i <= LEN(comments) ; i++)
     {
         tempString = MID$(comments, i, 1)
-        if (tempString != " " && tempString < "0" && tempString > "9" && tempString < "A" && tempString > "F")
+        if (tempString != " " && (tempString < "0" || tempString > "9") && (tempString < "A" || tempString > "F"))
         {
             retInt = 0;
             return;
@@ -377,7 +377,7 @@ doesCommentContainTestData()
 
 queueUpTestBytes()
 {
-    i = 1;
+    i = 2;
     while (i < LEN(comments))
     {
         skipSpaces();
@@ -497,6 +497,8 @@ matchOperatorTo65c02Instruction()
             skipOpcodeData();
         }
     }
+    // Skip over the terminating empty string.
+    READ tempString;
 }
 
 fetchOpcodes()
@@ -600,7 +602,7 @@ emit1Byte()
     POKE programCounter, emitByte
     programCounter++;
     
-    if (testFlag)
+    if (testFlag && pass == 2)
         checkTestByte();
 }
 
@@ -946,7 +948,7 @@ parseAsDirective()
 
 matchOperatorToDirective()
 {
-    for (i = 0 ; i < directiveCount ; i++)
+    for (i = 1 ; i <= directiveCount ; i++)
     {
         READ tempString
         if (tempString == operator)
