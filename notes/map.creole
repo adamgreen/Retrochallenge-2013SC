@@ -43,56 +43,90 @@
 | 6000 | parseHexValue |
 | 6100 | parseDecValue |
 | 6200 | parseSymbolName |
-| 30000 | STOP | Temp STOP |
-| 31000 | RETURN | Temp RETURN |
+| 6300 | isAbsoluteOrZeropage |
+| 6400 | handleAbsoluteOrZeropage |
+| 6500 | emitZerpageOrAbsolute |
+| 6600 | emit8BitExpression |
+| 6700 | emit16BitExpression |
+| 6800 | isAbsoluteOrZeropageIndexed |
+| 6900 | handleAbsoluteOrZeropageIndexed |
+| 7000 | isAbsoluteOrZeropageIndexedIndirect |
+| 7100 | handleAbsoluteOrZeropageIndexedIndirect |
+| 7200 | isIndirectIndexed |
+| 7300 | handleIndirectIndexed |
+| 7400 | isAbsoluteOrZeropageIndirect |
+| 7500 | handleAbsoluteOrZeropageIndirect |
+| 7600 | signalBadOperand |
+| 7700 | parseAsDirective |
+| 7800 | matchOperatorToDirective |
+| 7900 | handleASC |
+| 8000 | handleDB |
+| 8100 | findNextComma |
+| 8200 | handleDS |
+| 8300 | handleDW |
+| 8400 | handleEQU |
+| 8500 | handleLST |
+| 8600 | handleSAV |
+| 8700 | handleTST |
+| 8800 | generateListOutput |
+| 8900 | listLineNumber |
+| 9000 | listAddress |
+| 9100 | printHexByte |
+| 9200 | printHexNibble |
+| 9300 | listEquValueAndSource |
+| 9400 | listMachineCodeAndSource |
+| 9500 | listLineText |
+| 9600 | rewindSource |
+| 9700 | closeSource |
+| 9800 | cleanup |
 
 
 == BASIC Variable Name to Pseudocode Name Mapping
-|= BASIC Name |= Pseudo Name |= Notes |
-| A | lineProgramCounter | X |
-| A% | lineLength | **renamed from L% |
-| A$ | lineText | X |
-| AI% | absoluteIndex | |
-| C$ | comments | X |
-| CM% | comma | |
-| CP% | closeParen | |
-| D$ | D$ | X |
-| D1% | dataLineLo | X |
-| D2% | dataLineHi | X |
-| D3% | dataPtrLo | X |
-| D4% | dataPtrHi | X |
-| DC% | directiveCount | **renamed from B% |
-| E | equValue | X |
-| E% | expressionValue | |
-| E$ | expression | X |
-| F% | found | |
-| I | i | X |
-| IC% | instructionCount | **renamed from A%** |
-| K | j | X My J key isn't working |
-| L$ | label | X |
-| LI% | labelIndex | X |
-| LF% | listFlag | X |
-| O% | opcodes | |
-| O$ | operator | X |
-| OP% | openParen | |
-| P | programCounter | X |
-| P% | pass | X |
-| P$ | operand | X |
-| R% | retInt | X |
-| S$ | symbolName | X |
-| S1% | sourceDataLineLo | X |
-| S2% | sourceDataLineHi | X |
-| S3% | sourcePtrLo | X |
-| S4% | sourcePtrHi | X |
-| SC% | symbolCount | X |
-| SI% | symbolIndex | X |
-| SN$ | symbolNames | X |
-| SV% | symbolValues | X |
-| TC% | testQueueCount | |
-| TR% | testQueueRead | |
-| TW% | testQueueWrite | |
-| T% | tempInt | |
-| T$ | tempString | X |
-| TF% | testFlag | X |
-| X% | emitByte | |
-| ZI% | zeropageIndex | |
+|= BASIC Name |= Pseudo Name |
+| A | lineProgramCounter |
+| A% | lineLength |
+| A$ | lineText |
+| C$ | comments |
+| CM% | comma |
+| CP% | closeParen |
+| D$ | D$ |
+| D1% | dataLineLo |
+| D2% | dataLineHi |
+| D3% | dataPtrLo |
+| D4% | dataPtrHi |
+| DC% | directiveCount 
+| E | equValue |
+| E% | expressionValue |
+| E$ | expression |
+| F% | found |
+| I | i |
+| IC% | instructionCount |
+| K | j |
+| L$ | label |
+| LI% | labelIndex |
+| LF% | listFlag |
+| M | k |
+| N% | length2 |
+| O% | opcodes |
+| O$ | operator |
+| OP% | openParen |
+| P | programCounter |
+| P% | pass |
+| P$ | operand |
+| R% | retInt |
+| S$ | symbolName |
+| S1% | sourceDataLineLo |
+| S2% | sourceDataLineHi |
+| S3% | sourcePtrLo |
+| S4% | sourcePtrHi |
+| SC% | symbolCount |
+| SI% | symbolIndex |
+| SN$ | symbolNames |
+| SV% | symbolValues |
+| TC% | testQueueCount |
+| TR% | testQueueRead |
+| TW% | testQueueWrite |
+| T% | tempInt |
+| T$ | tempString |
+| TF% | testFlag |
+| X% | emitByte |
