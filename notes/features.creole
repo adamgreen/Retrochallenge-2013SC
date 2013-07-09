@@ -378,3 +378,24 @@ This is for unit testing only.  If the TST directive is located towards the top 
 mode will be enabled.  This unit testing mode will parse comments to determine if it only contains spaces and valid
 hexadecimal digits.  If they do contain hexadecimal values then the hexadecimal values indicate the expected object file
 output.  An error will be thrown on mismatch.
+
+Example:
+{{{
+32000  DATA  " TST"
+32005  DATA  "LABEL ADC #$20 ;69 20"
+}}}
+On line 32005, the {{{;69 20}}} comment indicates that the {{{ADC #$20}}} instruction is expected to emit two machine
+code values and they are to have the values of **0x69** and **0x20**.
+
+Some notes about this test functionality:
+* The test comments don't have to be on the same line as the code to which they apply.  They can actually occur anywhere
+after the previous code emitting line of source code and the one to be tested.  So the previous example could have been:
+{{{
+32000 DATA  " TST"
+32001 DATA "; 69"
+32002 DATA "; 20"
+32005 DATA  "LABEL ADC #$20"
+}}}
+* Spaces between the hex values are optional so the comment can be shorted to {{{;6920}}}.
+* Normal comments can be inserted in the source code and they will be ignored by the unit test framework as long as the comment 
+ contains characters other than spaces and valid hex digits.
