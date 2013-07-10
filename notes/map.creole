@@ -81,6 +81,8 @@
 | 9800 | cleanup |
 | 9900 | verifyTestQueueEmpty |
 | 10000 | signalTestFailure |
+| 10100 | printSummary |
+| 10200 | print4DigitHexValue |
 
 
 == BASIC Variable Name to Pseudocode Name Mapping
@@ -100,6 +102,7 @@
 | E | equValue |
 | E% | expressionValue |
 | E$ | expression |
+| EC% | errorCount |
 | F% | found |
 | I | i |
 | IC% | instructionCount |

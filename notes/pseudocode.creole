@@ -57,6 +57,7 @@ int16_t  symbolCount;
 int16_t  testQueueWrite;
 int16_t  testQueueRead;
 int16_t  testQueueCount;
+int16_t  errorCount;
 int16_t  openParen;
 int16_t  closeParen;
 int16_t  comma;
@@ -94,6 +95,7 @@ main()
     runPass();
     verifyTestQueueEmpty();
     closeSource();
+    printSummary();
     cleanup();
 }
 
@@ -138,6 +140,7 @@ initVariables()
     instructionCount = 0;
     directiveCount = 0;
     symbolCount = 0;
+    errorCount = 0;
     testQueueWrite = testQueueStart;
     testQueueRead = testQueueStart;
     testQueueCount = 0;
@@ -338,6 +341,7 @@ findNextNonWhitespace()
 
 printLineNumber()
 {
+    errorCount++;
     PRINT "LINE:"; dataLineHi*256 + dataLineLo ; " *";
 }
 
@@ -1070,7 +1074,7 @@ handleLST()
 
 handleSAV()
 {
-    if (pass == 2)
+    if (pass == 2 && errorCount == 0)
         PRINT D$;"BSAVE ";operand;", A";machineCodeStart;", L";programCounter-machineCodeStart
     return;
 }
@@ -1124,12 +1128,16 @@ printHexNibble()
 listEquValueAndSource()
 {
     PRINT " =";
+    print4DigitHexValue();
+    listLineText();
+}
+
+print4DigitHexValue()
+{
     emitByte = equValue / 256;
     printHexByte();
     emitByte = equValue - (emitByte * 256);
     printHexByte();
-    
-    listLineText();
 }
 
 listMachineCodeAndSource()
@@ -1181,6 +1189,20 @@ verifyTestQueueEmpty()
 closeSource()
 {
     // Nothing to be done here when using DATA statements.
+}
+
+printSummary()
+{
+    PRINT
+    PRINT "ASSEMBLY COMPLETED OF ";programCounter-machineCodeStart;" BYTES"
+    PRINT errorCount;" ERROR(S) ENCOUNTERED"
+    PRINT
+    for (i = 0 ; i < symbolCount ; i++)
+    {
+        PRINT symbolNames(i);" = ";
+        equValue = symbolValues(i);
+        print4DigitHexValue();
+        PRINT " (";symbolValues(i);")"
 }
 
 cleanup()
