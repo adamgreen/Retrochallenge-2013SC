@@ -111,7 +111,10 @@ init()
 reserveMemoryForMachineCode()
 {
     // Check that HIMEM is where we expect it.
-    if (PEEK(0x74) << 8) | PEEK(0x73) != expectedHiMem)
+    programCounter = PEEK(0x74) << 8) | PEEK(0x73);
+    if (programCounter == machineCodeReserve)
+        return;
+    if (programCounter != expectedHiMem)
     {
         PRINT "*HIMEM"
         STOP
@@ -749,12 +752,12 @@ parseHexValue()
 
 parseDecValue()
 {
-    expressionValue = VAL(MID$(expression, 1));
+    expressionValue = VAL(expression);
 }
 
 parseSymbolName()
 {
-    symbolName = MID$(expression, 1);
+    symbolName = expression;
     findSymbol();
     if (symbolIndex != -1)
     {
@@ -1009,7 +1012,8 @@ handleDS()
 {
     if (operand == "/")
     {
-        expressionValue = (programCounter + 0x7F) & ~0x7F;
+        // Always round up to next page, even if at start of current page.
+        expressionValue = ((programCounter + 0x80) & ~0x7F) - programCounter;
     }
     else
     {
@@ -1141,7 +1145,7 @@ listMachineCodeAndSource()
             PRINT
         }
     
-        HTAB(13 + 3*(i - ((i / 3)*3)))
+        HTAB(12 + 3*(i - ((i / 3)*3)))
         emitByte = PEEK(lineProgramCounter+i)
         printHexByte();
     }
