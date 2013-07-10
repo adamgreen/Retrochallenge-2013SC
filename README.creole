@@ -1,3 +1,78 @@
+==July 9th, 2013 - Testing and Debugging
+
+===TST Mode
+One of the first things I did today was enable and fix the bugs in my unit testing functionality.  This code is enabled
+by including a TST directive near the beginning of the assembly source.  Once this test mode is enabled, the comment
+field is used to provide the expected values for the emitted machine code.  For example:
+{{{
+32000  DATA  " TST"
+32005  DATA  "LABEL ADC #$20 ;69 20"
+}}}
+On line 32005, the {{{;69 20}}} comment indicates that the {{{ADC #$20}}} instruction is expected to emit two machine
+code values and they are to have the values of **0x69** and **0x20**.  Refer to the 
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#tst | feature documentation for more information on the TST directive]].
+
+===SAV Bug
+I also tested out the LST and SAV directives and fixed bugs that I encountered.  I did hit an interesting bug in my
+understanding of Applesoft BASIC and ProDOS today when testing out the SAV directive.  The SAV directive should have
+taken the resulting machine code and saved it to disk as a binary file that is BRUNnable but the resulting binary file
+just contained two bytes of 0 instead of the expected machine code of 0x69 and 0x20.
+
+My code flow for creating machine code is roughly the following:
+* reserveMemoryForMachineCode (line 2200 in BASIC) sets HIMEM: to 0x7600 instead of the initial 0x9600 set by ProDOS.
+  This limits the highest address available to Applesoft BASIC so that it will allocate strings from just below this
+  address.
+* runPass (line 2900) initializes programCounter (P variable in BASIC code).
+* emit1Byte (line 5400) will emit machine code to the address specified by programCounter and then increment that
+  counter.  This causes the assembler to start emitting machine code to address 0x7600 and increment upwards in memory,
+  making sure to not exceed into the 0x9600 region used by ProDOS.
+* handleSAV (line 8600) issues a BSAVE command to ProDOS instructing it to save the 2 bytes of machine code starting at
+  address 0x7600.
+
+The fact that I was getting zeroes in the resulting binary file was weird to me based on these observations:
+* The BSAVE command not only uses the supplied address to determine from where it should start the binary save, it also
+places this address in the ProDOS directory entry so that future BLOADs will default to loading into the same address.
+Running a CATALOG command should the following text for this file which indicates that the BSAVE was instructed to save
+2 bytes from the correct address of 0x7600.
+{{{
+TEST.BIN        BIN       1  <NO DATE>        <NO DATE>              2 A=$7600
+}}}
+* I knew that the expected opcode value of 0x69 had been located in memory at some point because:
+** The second pass of the assembler would have checked that the opcode byte matched between the two passes to make sure
+   that there wasn't a phasing error.
+** The second pass of the assembler had also successfully verified that this opcode byte was 0x69 because of the use of
+   the TST directive to enable the test mode.
+** When debugging previous issues in my code, I had actually PEEKed into the contents of memory at locations 0x7600 and
+   0x7601 to find the expected values.
+
+From here my next debugging step was to PEEK into the contents of 0x7600 and 0x7601 at the completion of the program
+after I had REMarked out the code at line 9800 which would have reset HIMEM: back up to its original value of 0x9600.
+What did I find?  Oddly enough I found that the two bytes did indeed just contain zeroes.  
+
+I thought that maybe by allowing the code to run to completion, I had allowed some other code to run which zeroed it out
+after the call to BSAVE.  To make sure that this wasn't happening, I added a STOP to the code immediately after the
+BSAVE call had been made.  The result of this was the same zeroes.  
+
+Based on my previous observations I was pretty sure that the bytes had been properly set when assembling the previous
+source line.  To verify this I moved the STOP so that it occurred just before the BSAVE call was made.  PEEKing into
+memory here showed the expected values of 0x69 and 0x20.  Letting the code to continue running, it made the call to
+BSAVE and then STOPped again.  PEEKing at the bytes again here showed that the call to BSAVE itself had zeroed out my
+machine code output.
+
+Google to the rescue!  I typed "HIMEM ProDOS" into Google and the first result led to the 
+[[http://macgui.com/usenet/?group=1&id=153171#msg | answer for my woes]].  The answer is in this quote from David Empson
+on October 28th, 1998:
+{{{
+According to the ProDOS-8 technical reference, BASIC.SYSTEM uses the 1K
+above HIMEM as its working buffer.  This means that you should reduce
+HIMEM by the number of pages you need, but skip four pages to locate the
+area you can use safely.
+}}}
+That explains why my machine code is getting overwritten since it is in the first 2 bytes of that 1K block used by
+BASIC.SYSTEM.  I modified the assembler to start emitting machine code just after this 1K region and then the SAV worked
+perfectly.  Problem solved!
+
+
 ==July 8th, 2013 - Successfully Assembled 1 Line of 6502 Code
 
 I hit a relatively major milestone today when I finished implementing the first revision of my simple 65c02 assembler in
