@@ -79,6 +79,8 @@
 | 9600 | rewindSource |
 | 9700 | closeSource |
 | 9800 | cleanup |
+| 9900 | verifyTestQueueEmpty |
+| 10000 | signalTestFailure |
 
 
 == BASIC Variable Name to Pseudocode Name Mapping

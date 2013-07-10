@@ -92,6 +92,7 @@ main()
     rewindSource();
     pass = 2;
     runPass();
+    verifyTestQueueEmpty();
     closeSource();
     cleanup();
 }
@@ -612,11 +613,7 @@ checkTestByte()
 {
     dequeueTestByte();
     if (tempInt != emitByte)
-    {
-        printLineNumber();
-        PRINT "TST_FAIL"
-        STOP
-    }
+        signalTestFailure();
 }
 
 dequeueTestByte()
@@ -633,6 +630,13 @@ dequeueTestByte()
     if (testQueueRead > testQueueEnd)
         testQueueRead = testQueueStart;
     testQueueCount--;
+}
+
+signalTestFailure()
+{
+    printLineNumber();
+    PRINT "TST_FAIL"
+    STOP
 }
 
 handleImmediate()
@@ -765,7 +769,7 @@ parseSymbolName()
     }
     else
     {
-        expressionValue = -1;
+        expressionValue = 256;
         printLineNumber();
         PRINT "BAD_LABEL"
     }
@@ -1159,6 +1163,15 @@ rewindSource()
     dataLineHi = sourceDataLineHi;
     dataPtrLo = sourceDataPtrLo;
     dataPtrHi = sourceDataPtrHi;
+}
+
+verifyTestQueueEmpty()
+{
+    if (pass == 1 || !testFlag)
+        return;
+    if (testQueueCount)
+        signalTestFailure();
+    
 }
 
 closeSource()
