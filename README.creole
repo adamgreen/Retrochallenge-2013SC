@@ -1,3 +1,12 @@
+==July 10th, 2013 - Testing and Debugging - Day 2
+
+It's lucky that I wrote so many bugs into my code!  It keeps giving me something to work on :)
+
+Diffs for today's commits:
+* [[https://github.com/adamgreen/Retrochallenge-2013SC/commit/814744e319166fe25162b31faeb72824b72f4eb2 | Added tests for the rest of the directives]]
+* [[https://github.com/adamgreen/Retrochallenge-2013SC/commit/f6d012060aeb03a1c30d0d0721fd406f3e257d89 | Print summary notes at end of assembly process]]
+
+
 ==July 9th, 2013 - Testing and Debugging
 
 ===TST Mode
