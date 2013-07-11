@@ -37,7 +37,7 @@ What follows is an example source line which contains text for all of the suppor
 
 * The supported fields are label, opcode, operand, and comment.
 * The fields are separated by one or more spaces.
-* The length of the source line is limited to the 255 characters supported by Applesoft for the whole DATA line.
+* The length of the source line is limited to the <255 characters supported by Applesoft for the whole DATA line.
 
 
 === Label
@@ -334,7 +334,7 @@ Example:
 {{{
 32000 DATA "        LDA #1"
 32010 DATA "        RTS"
-32020 DATA "        SAV EXAMPLE2.BIN    ; Saves code meant for address $9000 into EXAMPLE2 object file."
+32020 DATA "        SAV EXAMPLE2.BIN    ; Saves machine code to the EXAMPLE2 object file."
 }}}
 
 ===END
@@ -399,3 +399,73 @@ after the previous code emitting line of source code and the one to be tested.  
 * Spaces between the hex values are optional so the comment can be shorted to {{{;6920}}}.
 * Normal comments can be inserted in the source code and they will be ignored by the unit test framework as long as the comment 
  contains characters other than spaces and valid hex digits.
+
+
+== Error Messages
+If any errors are encountered while assembling your program, the assembler will ignore the SAV directive since there is
+no reason to save out known bad machine code.  The total error count is also displayed to the console at the end of
+the assembly process.
+
+{{{*HIMEM}}} - The assembler expects to run on a machine with 64K+ of RAM so that HIMEM: is initially set to a value of
+0x9600 by ProDOS.  The assembler will fail with this error if this is not the case.  The assembler will STOP if it
+encounters this error.
+
+{{{*NORAM}}} - The BASIC code is so large that it is overflowing into the area where the assembler will place the machine
+code.  The assembler will STOP if it encounters this error.
+
+{{{LINE:XXXX *EXTRA_INPUT}}} - The assembler only expects a line to contain label, operator, operand, and comment 
+fields.  It will throw this error if it encounters extra fields on the line that it is going to ignore.
+
+{{{LINE:XXXX *INVALID_OPCODE}}} - The text in the operand field of a source line isn't a recognized 65c02 instruction or
+assembler directive.
+
+{{{LINE:XXXX *TST_OVER}}} - When in TST mode, the source code attempted to queue up more than the maximum of 256
+verification bytes.  This could occur because you attempted to test more than 256 bytes at a time or previous
+instructionsthat you thought would generate machine code didn't.  The assembler will STOP if it encounters this error.
+
+{{{LINE:XXXX *DUP_LABEL}}} - Indicates that a line label with the same name has already been used as a line label in the
+code.
+
+{{{LINE:XXXX *TOO_MANY_LABELS}}} - There is a limit to the number of label symbols which can be defined in a program.
+This error will be thrown if this limit is exceeded.  The initial version of the assembler uses a limit of 256 entries.
+The assembler will STOP if it encounters this error.
+
+{{{LINE:XXXX *BAD_ADDR}}} - The addressing mode for this line of the source code isn't support for the specified 65c02
+instruction or assembler directive.
+
+{{{LINE:XXXX *PHASE}}} - This indicates that there was a phasing error which occurs when the two passes of the assembler
+disagree on which addressing mode form of the instruction is to be used.  A forward reference to a zero page address
+would cause this error to be thrown since the first pass will assume that the forward reference will be absolute but the
+second pass has enough information to know that it is actually in the zero page.  The solution to such an error would be
+to forward declare the label so that the assembler knows that the address is in the zero page during the first pass as
+well.  The assembler will STOP if it encounters this error since it will typically lead to a cascade of more phasing
+errors.
+
+{{{LINE:XXXX *OOM}}} - The resulting machine code for this source code is too large to fit in the allocated space (8k in
+the initial version.)  The assembler will STOP if it encounters this error.
+
+{{{LINE:XXXX *TST_UNDER}}} - When in TST mode this error typically indicates that the generated machine code contained
+more bytes than that specified by the programmer in the unit test comment field.  The assembler will STOP if it
+encounters this error.
+
+{{{LINE:XXXX *TST_FAIL}}} - When in TST mode this error indicates that the generated machine code didn't match the
+expected value(s) from the corresponding unit test comment.  The assembler will STOP if it encounters this error.
+
+{{{LINE:XXXX *TOO_BIG}}} - The expression for an immediate operand doesn't fit in the required 8-bits.
+
+{{{LINE:XXXX *BAD_EXPR}}} - There is a syntax error in the format/spelling of the expression in the operand field.
+
+{{{LINE:XXXX *BAD_HEX}}} - A hexadecimal expression (indicated by a $ as the prefix) contains characters other than
+0-9 and A-F.  Most likely caused by typo or a missing space delimiter.
+
+{{{LINE:XXXX *BAD_LABEL}}} - A label used in an expression contains a reference to a label symbol that hasn't been
+defined.
+
+{{{LINE:XXXX *TOO_FAR}}} - The signed offset for a relative branch instruction doesn't fit in the required -128 to 127
+range.
+
+{{{LINE:XXXX *BAD_OPERAND}}} - The assembler found a syntax error in the operand field.  Examples include an ASC
+delimited string not containing the expected single quote as a delimiter, specifying an operand value other than "ON"
+or "OFF" to LST directive, etc.
+
+{{{LINE:XXXX *EQU_NOLABEL}}} - A line with an EQU operator must contain a label field as well.
