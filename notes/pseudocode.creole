@@ -585,6 +585,8 @@ handleImplied()
 
 signalInvalidAddressMode()
 {
+    if (pass == 1)
+        return;
     printLineNumber();
     PRINT "BAD_ADDR"
 }
