@@ -8,7 +8,7 @@ issues in the associated error handling code paths.
 
 Additionally, I tested all of the valid and invalid addressing modes for the ADC instruction.  The next day or so will
 be spent filling in the opcode table for all of the other 65c02 instructions.  Once that is done, the assembler will be
-code complete.
+feature complete.
 
 Diffs for today's commits:
 * [[https://github.com/adamgreen/Retrochallenge-2013SC/commit/d0dbd1254dc4e6a7b8eed646ff169b51f0f8119d | Test all valid and invalid addressing modes for ADC]]
