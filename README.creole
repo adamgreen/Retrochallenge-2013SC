@@ -1,3 +1,21 @@
+==July 11th, 2013 - Error Handling
+
+Most of my work today was concentrated around error handling.  First I went through the code and documented all of the
+error messages
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/features.creole#error-messages | here in the assembler documentation]].
+I also wrote several tests to force the assembler to generate these error messages so that I could verify and fix any
+issues in the associated error handling code paths.
+
+Additionally, I tested all of the valid and invalid addressing modes for the ADC instruction.  The next day or so will
+be spent filling in the opcode table for all of the other 65c02 instructions.  Once that is done, the assembler will be
+code complete.
+
+Diffs for today's commits:
+* [[https://github.com/adamgreen/Retrochallenge-2013SC/commit/d0dbd1254dc4e6a7b8eed646ff169b51f0f8119d | Test all valid and invalid addressing modes for ADC]]
+* [[https://github.com/adamgreen/Retrochallenge-2013SC/commit/57c36cf940ef5aacd81f38c72dfdeee4cf7190b1 | Added error text message descriptions]]
+* [[https://github.com/adamgreen/Retrochallenge-2013SC/commit/157a7dfb09e233e602efec8108f1656aa2cd8935 | Test and improve error handling]]
+
+
 ==July 10th, 2013 - Testing and Debugging - Day 2
 
 It's lucky that I wrote so many bugs into my code!  It keeps giving me something to work on :)
