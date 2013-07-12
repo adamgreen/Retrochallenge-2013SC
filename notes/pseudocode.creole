@@ -259,7 +259,7 @@ fetchAndSplitNextLine()
     operand = tempString;
 
     extractNextField();
-    if (!retInt)
+    if (!retInt && pass == 2)
     {
         printLineNumber();
         PRINT "EXTRA_INPUT"
@@ -353,7 +353,7 @@ parseLine()
     found = 0;
     parseAs65c02Instruction();
     parseAsDirective();
-    if (!found && operator != "END")
+    if (!found && operator != "END" && pass == 2)
     {
         printLineNumber();
         PRINT "INVALID_OPCODE"
@@ -426,10 +426,10 @@ queueTestByte()
 
 createLabelSymbolIfNeeded()
 {
+    labelIndex = -1;
     if (label == "" || pass == 2)
         return;
         
-    labelIndex = -1;
     symbolName = label;
     findSymbol();
     if (symbolIndex != -1)
@@ -537,7 +537,7 @@ parseAddressAndEmitMachineCode()
         handleAbsoluteOrZeropage();
     else if (isAbsoluteOrZeropageIndexed())
         handleAbsoluteOrZeropageIndexed();
-    else if (isAbsoluteOrZeroapgeIndexedIndirect())
+    else if (isAbsoluteOrZeropageIndexedIndirect())
         handleAbsoluteOrZeropageIndexedIndirect();
     else if (isIndirectIndexed())
         handleIndirectIndexed();
@@ -545,7 +545,7 @@ parseAddressAndEmitMachineCode()
         handleAbsoluteOrZeropageIndirect();
     else
     {
-        signalBadOperand();
+        signalInvalidAddressMode();
         return;
     }
 }
@@ -650,7 +650,7 @@ signalTestFailure()
 
 handleImmediate()
 {
-    if (2 > length)
+    if (length < 2)
     {
         signalExpressionError();
         return;
@@ -680,23 +680,33 @@ handleImmediate()
         signalInvalidAddressMode();
         return;
     }
-    emitByte = opcodes[immediate];
-    emitMachineCode();
     
-    if (expressionValue > 255)
+    if (expressionValue < 256)
+    {
+        emitByte = opcodes[immediate];
+        emitMachineCode();
+    
+        emitByte = expressionValue;
+        emit1Byte();
+        return;
+    }
+    
+    if (pass == 2)
     {
         printLineNumber();
         PRINT "TOO_BIG"
         return;
     }
-    emitByte = expressionValue;
-    emit1Byte();
 }
 
 signalExpressionError()
 {
-    printLineNumber();
-    PRINT "BAD_EXPR"
+    expressionValue = 0;
+    if (pass == 2)
+    {
+        printLineNumber();
+        PRINT "BAD_EXPR"
+    }
 }
 
 parseExpression()
@@ -746,9 +756,12 @@ parseHexValue()
         }
         else
         {
-            expressionValue = -1;
-            printLineNumber();
-            PRINT "BAD_HEX"
+            expressionValue = 0;
+            if (pass == 2)
+            {
+                printLineNumber();
+                PRINT "BAD_HEX"
+            }
             return;
         }
         
@@ -881,10 +894,10 @@ handleAbsoluteOrZeropageIndexed()
     }
 }
 
-int isAbsoluteOrZeroapageIndexedIndirect()
+int isAbsoluteOrZeropageIndexedIndirect()
 {
     return comma != -1 && openParen != -1 && closeParen != -1 && 
-           closeParen > comma && openParen < closeParen;
+           openParen < comma && closeParen > comma;
 }
 
 handleAbsoluteOrZeropageIndexedIndirect()
@@ -918,7 +931,7 @@ handleIndirectIndexed()
         return;
     }
     
-    if (opcodes[indirectIndexed] != 255)
+    if (expressionValue < 256 && opcodes[indirectIndexed] != 255)
     {
         emitByte = opcodes[indirectIndexed];
         emitMachineCode();
@@ -941,12 +954,6 @@ handleAbsoluteOrZeropageIndirect()
     i = zeropageIndirect;
     j = absoluteIndirect;
     emitZeropageOrAbsolute();
-}
-
-signalBadOperand()
-{
-    printLineNumber();
-    PRINT "BAD_OPERAND"
 }
 
 parseAsDirective()
@@ -976,7 +983,7 @@ matchOperatorToDirective()
 
 handleASC()
 {
-    if (MID$(operand, 1, 1) != "'")
+    if (MID$(operand, 1, 1) != "'" || MID$(operand, length, 1) != "'")
     {
         signalBadOperand();
         return;
@@ -986,11 +993,14 @@ handleASC()
         emitByte = ASC(MID$(operand, i, 1));
         emitMachineCode();
     }
-    if (MID$(operand, length, 1) != "'")
-    {
-        signalBadOperand();
+}
+
+signalBadOperand()
+{
+    if (pass == 1)
         return;
-    }
+    printLineNumber();
+    PRINT "BAD_OPERAND"
 }
 
 handleDB()
@@ -1048,15 +1058,20 @@ handleDW()
 
 handleEQU()
 {
+    // Parse the expression in pass 2 also to report any errors that are encountered.
     expression = operand;
     parseExpression();
-    
+
+    if (pass == 2)
+        return;
+
     if (labelIndex == -1)
     {
         printLineNumber();
         PRINT "EQU_NOLABEL"
         return;
     }
+
     symbolValues[labelIndex] = expressionValue;
     equValue = expressionValue;
 }
@@ -1076,6 +1091,11 @@ handleLST()
 
 handleSAV()
 {
+    if (operand == "")
+    {
+        signalBadOperand();
+        return;
+    }
     if (pass == 2 && errorCount == 0)
         PRINT D$;"BSAVE ";operand;", A";machineCodeStart;", L";programCounter-machineCodeStart
     return;
