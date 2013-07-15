@@ -297,15 +297,26 @@ extractNextField()
     }
     
     // Check for comment.
-    if (MID$(lineText,i,1) == ";")
+    tempString = MID$(lineText, i, 1);
+    if (tempString == ";")
     {
         comment = MID$(lineText, i);
         retInt = 1;
         return;
     }
-    
-    // Not comment so extract field.
-    findNextWhitespace();
+
+    // Find end of this field.
+    if (tempString == "'")
+    {
+        // Extract delimited string.
+        findEndOfString();
+        j++;
+    }
+    else
+    {
+        // Extract whitespace delimited field.
+        findNextWhitespace();
+    }
     tempString = MID$(lineText, i, j-i);
     i = j;
     
@@ -315,6 +326,17 @@ extractNextField()
     
     retInt = 0;
     return;
+}
+
+findEndOfString()
+{
+    j = i+1;
+    while (j <= lineLength)
+    {
+        if (MID$(lineText,j,1) == "'")
+            return;
+        j++;
+    }
 }
 
 findNextWhitespace()
@@ -1058,22 +1080,19 @@ handleDW()
 
 handleEQU()
 {
-    // Parse the expression in pass 2 also to report any errors that are encountered.
     expression = operand;
     parseExpression();
 
-    if (pass == 2)
-        return;
-
-    if (labelIndex == -1)
+    if (pass == 1 && labelIndex == -1)
     {
         printLineNumber();
         PRINT "EQU_NOLABEL"
         return;
     }
 
-    symbolValues[labelIndex] = expressionValue;
     equValue = expressionValue;
+    if (pass == 1)
+        symbolValues[labelIndex] = expressionValue;
 }
 
 handleLST()

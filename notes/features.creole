@@ -312,14 +312,12 @@ Example:
 Inserts the specified ASCII text into the output image.
 * An operand containing a delimited string is required.
 * Use of the single quote as delimiter will set the high bit of each ASCII character to 0.
-* Currently no spaces can be contained within the text.  A separate **DB $20** source line can be used to insert a space
-  character instead.
+* Spaces can be used within the delimited string.  Normally spaces are used as a field separator and aren't allowed 
+  within a field.  This is the only exception to that rule.
 
 Example:
 {{{
-32000 DATA "        ASC 'Sample'"
-32010 DATA "        DB $20"
-32020 DATA "        ASC 'string'"
+32000 DATA "        ASC 'Sample string'"
 }}}
 
 ===SAV
