@@ -1,3 +1,75 @@
+==July 15th, 2013 - Feature Complete at Half Way Mark
+
+It is hard to believe that we are already half way through the month.   It is awe inspiring to look at all of the other cool Retrochallenge projects progressing [[http://www.wickensonline.co.uk/retrochallenge-2012sc/2013/07/15/half-time-roundup/ | here]].  I don't stand a chance against competition like that but at least I am having gobs of fun and learning tons about the Apple II.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130715-01.jpg}}
+
+This weekend I finished the 65c02 opcode table.  The screenshot above shows a snippet of an actual HelloWorld sample being assembled and the resulting binary executing successfully.  I did suppress some of the assembler output so that everything would fit on the screen but the complete code listing follows:
+
+{{{
+32000  DATA "COUT    EQU $FDED"
+32010  DATA "CR      EQU $FC62"
+32020  DATA "        LDX #0"
+32030  DATA "LOOP    LDA STR,X"
+32040  DATA "        BEQ EXIT"
+32050  DATA "        PHX"
+32055  DATA "        ORA #$80"
+32060  DATA "        JSR COUT"
+32070  DATA "        PLX"
+32080  DATA "        INX"
+32090  DATA "        BRA LOOP"
+32100  DATA "EXIT    JSR CR"
+32110  DATA "        RTS"
+32115  DATA "        LST OFF"
+32120  DATA "STR     ASC 'HELLO RETROCHALLENGE 2013!'
+32130  DATA "        DB 0"
+32140  DATA "        SAV HELLO.BIN"
+63999  DATA " END"
+}}}
+
+===Revisit My Initial Challenge Goals
+* Have Fun.  **Check**
+* Learn more about programming my Apple ][e. **Check**
+* Write a simple 6502 assembler in AppleSoft BASIC. **Check**
+* Actually write the code on my Apple ][e and only switch to an emulator if something should break on the real hardware
+  during the challenge timeframe. **Check**
+* Read 6502 assembly language source code from DATA statements appended to the end of the assembler program. **Check**
+* Output human readable listing output to the screen as part of the assembly process. **Check**
+* Output a BLOADable program to a ProDOS file. **Check**
+
+I guess I didn't really challenge myself :) So...
+
+===What's Next?
+What should I do for the next 2+ weeks of the Retrochallenge?
+
+Sleep?  Nah, sleep is optional and besides I can catch up on that in August, after the Challenge.
+
+I can definitely think of a few more goals to append to my initial challenge list.
+
+====Improve Assembly Performance
+To say that my Applesoft code has resulted in a **slow** assembler would be an understatement!  It takes 3 minutes and 11 seconds to assemble that little HelloWorld sample seen above.  I definitely think there is some low hanging fruit that I could pick to help in the area of performance.
+
+====Make It Easier to Write Code with JSR and JMP Instructions
+As I mentioned back during the first week of the challenge, the **J** key on the keyboard of my Apple IIe isn't working.  That makes it pretty hard to use 6502 instructions such as JSR and JMP.  I actually issue a {{{PRINT CHR$(74)}}} to have Applesoft BASIC display a J character on the screen.  I then use the crude editing functionality in Applesoft to trace my cursor over that printed J character whenever I need it for something like a JMP or JSR instruction.
+
+Over the next two weeks I will take my Apple II apart in an attempt to fix this issue.
+
+====Put the Assembler to Use
+I definitely want to spend time through the rest of the month continuing to learn by actually using the assembler to write some simple Apple II assembly language programs as I continue to read books like Gary B. Little's "Inside the Apple IIe".
+
+===Revised Challenge Goals
+
+My revised challenge goals for the second half of July are therefore:
+
+* Continue having fun.
+* Continue learning more about programming my Apple ][e.
+* Attempt to fix the **J** key on my Apple ][e keyboard.
+* Write actual 6502 assembly language programs using my assembler.
+* Improve performance of assembler enough to make previous goal tolerable.
+* Actually write the code on my Apple ][e and only switch to an emulator if something should break on the real hardware
+  during the challenge timeframe.
+
+
 ==July 11th, 2013 - Error Handling
 
 Most of my work today was concentrated around error handling.  First I went through the code and documented all of the
