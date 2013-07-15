@@ -817,16 +817,16 @@ handleAbsoluteOrZeropage()
     
     // Handle as relative instruction.
     expressionValue = expressionValue - lineProgramCounter - 2;
-    if (pass == 2 && expressionValue < -128 || expressionValue > 127)
-    {
-        printLineNumber();
-        PRINT "TOO_FAR"
-        return;
-    }
-    
     emitByte = opcodes[relative];
     emitMachineCode();
     emit8BitExpression();
+    return;
+    
+    if (pass == 2 && (expressionValue < -128 || expressionValue > 127))
+    {
+        printLineNumber();
+        PRINT "TOO_FAR"
+    }
 }
 
 emitZeropageOrAbsolute()
