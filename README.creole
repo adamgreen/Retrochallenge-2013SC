@@ -1,10 +1,123 @@
+==Initial Challenge Goals Met
+I have met my initial Retrochallenge 2013 goals and I am now working through revised goals for the rest of July.
+
+[[https://github.com/adamgreen/Retrochallenge-2013SC#july-15th-2013---feature-complete-at-the-halfway-mark | Read more...]]
+
+
+==July 16th, 2013 - Performance
+
+I had previously mentioned that it was taking **3 minutes and 11 seconds** to assemble my simple 41 line HelloWorld
+program.  I expected my initial Applesoft BASIC code to be slow but this is much worse than I expected.  There were
+definitely some decisions that I made when writing the assembler that aren't best practices for Applesoft performance.
+These include:
+
+* **Extraneous use of GOSUB:**  I broke the program down into small units of functionality in the pseudocode so that
+  each subroutine performs one task and one task only.  This makes it easier for me to read the code but creates the
+  need for a lot of GOSUBs in the resulting BASIC code.  If a function is only called once then inlining it will make
+  the program smaller and faster since there would be no need for the GOSUB call.  You would often be able to get rid of
+  the RETURN call as well but in some cases, the RETURN would need to be replaced with a GOTO which isn't as fast.
+* **Large line numbers:**  The main code starts at line 2000 and each subroutine starts on a line which is an even
+multiple of 100.  This results in longer target line numbers for GOSUB and GOTO statements in the code.  Not only does
+this make the code larger, it also makes the runtime parsing of the line numbers slower.
+* **Subroutine order:**  The subroutines were translated to BASIC in the same order as they were found in the pseudo
+code.  This order is about making it easier to read the pseudocode from top to bottom and cares nothing for performance.
+The subroutines which are called the most often in BASIC should be given low line numbers so that the linear search
+conducted by Applesoft for GOSUB calls will find them more quickly.
+* **Variable order:**  No care was taken to order the initialization of variables in the BASIC code.  Like subroutines,
+Applesoft performs a linear search to find variables when they are referenced by name in the code.  Variables used in
+hot routines should be initialized early so that they are found sooner during the search.
+
+===Poor Man's Profiler
+One of the best rules for performance optimization is to only optimize the parts of the code where you are spending your
+time.  So where is the assembler spending its time?  Profiling the code while it is assembling some 6502 code would be
+nice.  How to most easily profile the code running on my actual Apple IIe hardware?  
+
+I think the "Poor Man's Profiler" might be the right way to go here.  This profiling technique works just as well on
+these old machines as it does on current ones.  On a current machine I would use a debugger as the
+"Poor Man's Profiler".  Just break into the program a dozen or more times while the application is running and note the
+call stacks that you obtain.  The most time consuming routines tend to bubble to the top of this list.  You can think of
+this as a manual sampling profiler.  The same profiling approach can be done in Applesoft by pressing **CTRL+C** while
+the program is running, noting the line number it stops on, and then issuing the **CONT** command to continue execution.
+I did this several times in my assembler and the results were pretty close to what I expected:
+
+|= Line Number |= Occurrences |= Routine |= Notes |= Percentage |
+| 2500 | 7 | skipOpCodeData | Called from matchOperatorTo65c02Instruction | 70% |
+| 4700 | 2 | matchOperatorTo65c02Instruction | | 20% |
+| 3500 | 1 | findNextNonWhitespace | | 10% |
+
+9/10ths of my hits were in the code used to lookup the operator string in the opcode table.  This code needs some
+improvement!
+
+===Binary is Better!
+The matchOperatorTo65c02Instruction function actually does a linear search through the DATA statements that start at
+line 1000 in the BASIC code.  I had suspected that this linear search was giving me problems as I watched the listing
+output generation during unit test runs.  The lines towards the end of the listing were much slower to generate than the
+earlier ones.   These lines were testing opcodes that were also at the end of the opcode table.  The worst performers
+were the directives which actually caused the code to search through all of the opcode table to only fail finding a
+match and then need to search through a separate directives table.
+
+My initial opcode table was already in sorted in alphabetical order since that is how it was arranged in the source
+table from the Apple IIe Technical Reference Manual.  This makes it an ideal candidate for a binary search.  I split the
+work of enabling a binary search of this table into three parts:
+* First I pulled the directives into the same table as the 65c02 instructions so that only one search needs to be
+performed.  Whereas the 65c02 instruction entries contain 14 opcodes for the the different addressing modes, the
+directives just have one which is set to 0.
+* I implemented a new function called populateOpcodeTableEntries (line 10400 in BASIC) which is called during startup.
+This function walks the sorted opcode table once to count the number of entries.  It uses this count to DIMension some
+arrays and then walks the opcode table again to fill in these arrays.  One array is used to store the operator names for 
+ach table entry.  The other arrays are used to store the DATA pointers for where the opcodes can be found in memory for
+the corresponding operator.  In the case of directives, these pointers will just be set to a 0 based index to indicate
+which directive of ASC, DB, DS, DW, EQU, LST, SAV, or TST the entry corresponds.
+* I then reworked the runtime code which searches for an operator match in the table.  It now does a binary search on
+the array of operator names.  If if gets a match for a directive then it can just pulls the directive index directly
+from the corresponding DATA pointer array and returns.  In the case of 65c02 instructions, it reset the current DATA
+pointer to the corresponding entry from the DATA pointer array, and then READs the 14 opcodes into the opcodes (O% in
+BASIC) array before returning.
+
+===Updating HELLO.BAS
+Once I had made and tested the above mentioned performance improvements in the core SASM.BAS code, I wanted to try them
+out with my HELLO.BAS program.  The easiest way to do this would be to delete the unit testing 65c02 source code lines
+(32000-63999) from the SASM.BAS program and replace them with the sample 65c02 source code from HELLO.BAS.
+
+Just to make sure that I didn't do something stupid, the first thing I did was lock the SASM.BAS file.
+{{{
+]LOCK SASM.BAS
+}}}
+
+I then loaded HELLO.BAS into memory and saved out the 65c02 source lines to a text file named CODE.TXT:
+{{{
+]LOAD HELLO.BAS
+]30000 PRINT CHR$(4);"OPEN CODE.TXT":PRINT CHR$(4);"WRITE CODE.TXT":LIST 32000,:PRINT CHR$(4);"CLOSE CODE.TXT":END
+]RUN 30000
+}}}
+
+Now I could just reload SASM.BAS, replaces its 65c02 source lines, and save out the result as HELLO.BAS:
+{{{
+]LOAD SASM.BAS
+]DEL 32000,63999
+]EXEC CODE.TXT
+]SAVE HELLO.BAS
+}}}
+
+===Updated Performance Measurements
+|= Original Run Time |= Current Run Time |= Improvement |
+| 191 seconds | 76 seconds | 60% |
+
+This is definitely a step in the right direction but there is still room for improvement!
+
+
 ==July 15th, 2013 - Feature Complete at the Halfway Mark
 
-It is hard to believe that we are already half way through the month.   It is awe inspiring to look at all of the other cool Retrochallenge projects progressing [[http://www.wickensonline.co.uk/retrochallenge-2012sc/2013/07/15/half-time-roundup/ | here]].  I don't stand a chance against competition like that but at least I am having gobs of fun and learning tons about the Apple II.
+It is hard to believe that we are already half way through the month.   It is awe inspiring to look at all of the other
+cool Retrochallenge projects progressing 
+[[http://www.wickensonline.co.uk/retrochallenge-2012sc/2013/07/15/half-time-roundup/ | here]].  I don't stand a chance
+against competition like that but at least I am having gobs of fun and learning tons about the Apple II.
 
 {{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130715-01.jpg}}
 
-This weekend I finished the 65c02 opcode table.  The screenshot above shows a snippet of an actual HelloWorld sample being assembled and the resulting binary executing successfully.  I did suppress some of the assembler output so that everything would fit on the screen but the complete code listing follows:
+This weekend I finished the 65c02 opcode table.  The screenshot above shows a snippet of an actual HelloWorld sample
+being assembled and the resulting binary executing successfully.  I did suppress some of the assembler output so that
+everything would fit on the screen but the complete code listing follows:
 
 {{{
 32000  DATA "COUT    EQU $FDED"
@@ -47,15 +160,22 @@ Sleep?  Nah, sleep is optional and besides I can catch up on that in August, aft
 I can definitely think of a few more goals to append to my initial challenge list.
 
 ====Improve Assembly Performance
-To say that my Applesoft code has resulted in a **slow** assembler would be an understatement!  It takes 3 minutes and 11 seconds to assemble that little HelloWorld sample seen above.  I definitely think there is some low hanging fruit that I could pick to help in the area of performance.
+To say that my Applesoft code has resulted in a **slow** assembler would be an understatement!  It takes 3 minutes and
+11 seconds to assemble that little HelloWorld sample seen above.  I definitely think there is some low hanging fruit
+that I could pick to help in the area of performance.
 
 ====Make It Easier to Write Code with JSR and JMP Instructions
-As I mentioned back during the first week of the challenge, the **J** key on the keyboard of my Apple IIe isn't working.  That makes it pretty hard to use 6502 instructions such as JSR and JMP.  I actually issue a {{{PRINT CHR$(74)}}} to have Applesoft BASIC display a J character on the screen.  I then use the crude editing functionality in Applesoft to trace my cursor over that printed J character whenever I need it for something like a JMP or JSR instruction.
+As I mentioned back during the first week of the challenge, the **J** key on the keyboard of my Apple IIe isn't working.
+That makes it pretty hard to use 6502 instructions such as JSR and JMP.  I actually issue a {{{PRINT CHR$(74)}}} to have
+Applesoft BASIC display a J character on the screen.  I then use the crude editing functionality in Applesoft to trace
+my cursor over that printed J character whenever I need it for something like a JMP or JSR instruction.
 
 Over the next two weeks I will take my Apple II apart in an attempt to fix this issue.
 
 ====Put the Assembler to Use
-I definitely want to spend time through the rest of the month continuing to learn by actually using the assembler to write some simple Apple II assembly language programs as I continue to read books like Gary B. Little's "Inside the Apple IIe".
+I definitely want to spend time through the rest of the month continuing to learn by actually using the assembler to
+write some simple Apple II assembly language programs as I continue to read books like Gary B. Little's
+"Inside the Apple IIe".
 
 ===Revised Challenge Goals
 
