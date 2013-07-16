@@ -103,7 +103,7 @@ init()
 {
     SPEED=255 // Make listing output as fast as possible.
     TEXT      // Make sure that we are in text mode.
-    PRINT: PRINT CHR$(4);"PR#3" : HOME // Switch to 80 Column Mode.
+    HOME      // Clear the screen.
     reserveMemoryForMachineCode();
     initVariables();
     countOpcodeTableEntries();
@@ -626,7 +626,8 @@ emitMachineCode()
 
 emit1Byte()
 {
-    if (programCounter >= expectedHiMem)
+    // Can use the 1K above original HIMEM as well since ProDOS will use the lower 1K of our reservation instead.
+    if (programCounter >= expectedHiMem + 1024)
     {
         printLineNumber();
         PRINT "OOM"
