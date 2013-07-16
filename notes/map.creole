@@ -26,9 +26,9 @@
 | 4300 | createLabelSymbolIfNeeded |
 | 4400 | findSymbol |
 | 4500 | allocateSymbol |
-| 4600 | parseAs6502Instruction |
-| 4700 | matchOperatorTo65c02Instruction |
-| 4800 | fetchOpcodes |
+| 4600 | matchOperator |
+| 4700 | //deleted// |
+| 4800 | //deleted// |
 | 4900 | parseAddressAndEmitMachineCode |
 | 5000 | findParensAndComma |
 | 5100 | handleImplied |
@@ -58,7 +58,7 @@
 | 7500 | handleAbsoluteOrZeropageIndirect |
 | 7600 | signalBadOperand |
 | 7700 | parseAsDirective |
-| 7800 | matchOperatorToDirective |
+| 7800 | //deleted// |
 | 7900 | handleASC |
 | 8000 | handleDB |
 | 8100 | findNextComma |
@@ -83,6 +83,8 @@
 | 10000 | signalTestFailure |
 | 10100 | printSummary |
 | 10200 | print4DigitHexValue |
+| 10300 | findEndOfString |
+| 10400 | populateOpcodeTableEntries |
 
 
 == BASIC Variable Name to Pseudocode Name Mapping
@@ -98,14 +100,12 @@
 | D2% | dataLineHi |
 | D3% | dataPtrLo |
 | D4% | dataPtrHi |
-| DC% | directiveCount 
 | E | equValue |
 | E% | expressionValue |
 | E$ | expression |
 | EC% | errorCount |
 | F% | found |
 | I | i |
-| IC% | instructionCount |
 | K | j |
 | L$ | label |
 | LI% | labelIndex |
@@ -114,6 +114,10 @@
 | N% | length2 |
 | O% | opcodes |
 | O$ | operator |
+| OC% | operatorCount |
+| OL% | opcodeLines |
+| ON$ | operatorNames |
+| OP% | opcodePointers |
 | OP% | openParen |
 | P | programCounter |
 | P% | pass |
