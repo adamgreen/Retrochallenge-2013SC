@@ -4,6 +4,16 @@ I have met my initial Retrochallenge 2013 goals and I am now working through rev
 [[https://github.com/adamgreen/Retrochallenge-2013SC#july-15th-2013---feature-complete-at-the-halfway-mark | Read more...]]
 
 
+==July 17th, 2013 - J is No Longer Missing in Action
+
+I took my Apple IIe apart last night to take a look at my J key issue.  I never figured out how to get access to the
+switches but I did notice that the solder joint on the J key looked a bit dull so I reflowed it with my soldering iron. 
+
+**BINGO**
+
+I now have a working J key!  That will make typing in 65c02 instructions such as **JMP** and **JSR** much easier.
+
+
 ==July 16th, 2013 - Performance
 
 I had previously mentioned that it was taking **3 minutes and 11 seconds** to assemble my simple 41 line HelloWorld
