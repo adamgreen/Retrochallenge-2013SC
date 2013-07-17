@@ -16,7 +16,7 @@ I now have a working J key!  That will make typing in 65c02 instructions such as
 
 ==July 16th, 2013 - Performance
 
-I had previously mentioned that it was taking **3 minutes and 11 seconds** to assemble my simple 41 line HelloWorld
+I had previously mentioned that it was taking **3 minutes and 11 seconds** to assemble my simple 15 line HelloWorld
 program.  I expected my initial Applesoft BASIC code to be slow but this is much worse than I expected.  There were
 definitely some decisions that I made when writing the assembler that aren't best practices for Applesoft performance.
 These include:
