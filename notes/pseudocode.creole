@@ -340,7 +340,7 @@ extractNextField()
     }
 
     // Find end of this field.
-    if (tempString == "'")
+    if (tempString == "'" || tempString == "`")
     {
         // Extract delimited string.
         findEndOfString();
@@ -367,7 +367,7 @@ findEndOfString()
     j = i+1;
     while (j <= lineLength)
     {
-        if (MID$(lineText,j,1) == "'")
+        if (MID$(lineText,j,1) == tempString)
             return;
         j++;
     }
@@ -1025,14 +1025,20 @@ parseAsDirective()
 
 handleASC()
 {
-    if (MID$(operand, 1, 1) != "'" || MID$(operand, length, 1) != "'")
+    tempString = MID$(operand, 1, 1);
+    if ((tempString != "'" && tempString != "`") || MID$(operand, length, 1) != tempString)
     {
         signalBadOperand();
         return;
     }
+
+    retInt = 0;
+    if (tempString == "`")
+        retInt = 0x80;
+
     for (i = 2 ; i < length ; i++)
     {
-        emitByte = ASC(MID$(operand, i, 1));
+        emitByte = ASC(MID$(operand, i, 1)) + retInt;
         emitMachineCode();
     }
 }
@@ -1070,8 +1076,8 @@ handleDS()
 {
     if (operand == "/")
     {
-        // Always round up to next page, even if at start of current page.
-        expressionValue = ((programCounter + 0x80) & ~0x7F) - programCounter;
+        // Round up to next page.
+        expressionValue = ((programCounter + 0x7f) & ~0x7F) - programCounter;
     }
     else
     {
@@ -1255,20 +1261,20 @@ closeSource()
 printSummary()
 {
     PRINT
-    PRINT "ASSEMBLY COMPLETED OF ";programCounter-machineCodeStart;" BYTES"
-    PRINT errorCount;" ERROR(S) ENCOUNTERED"
-    PRINT
     for (i = 0 ; i < symbolCount ; i++)
     {
         PRINT symbolNames(i);" = ";
         equValue = symbolValues(i);
         print4DigitHexValue();
         PRINT " (";symbolValues(i);")"
+    }
+    PRINT
+    PRINT programCounter-machineCodeStart;" BYTE(S)"
+    PRINT errorCount;" ERROR(S) ENCOUNTERED"
 }
 
 cleanup()
 {
-    HIMEM: expectedHiMem;
 }
 
 
