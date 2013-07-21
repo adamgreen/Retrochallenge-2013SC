@@ -1,0 +1,93 @@
+==DSPACE - My First 6502 Utility
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130720-01.jpg}}
+
+Yesterday, I wrote my first useful (to me anyway) utility to help with my Applesoft coding.  I will start by describing
+the problem I have been encountering.  
+
+To input 6502 assembly language code to my assembler, I write DATA statements like:
+{{{
+32000  DATA "COUT    EQU $FDED"
+32010  DATA "CR      EQU $FC62"
+32020  DATA "        LDX #0"
+}}}
+I will start with code like that but after some line editing where I use Applesoft's cursor scan functionality to trace
+over the existing characters that I want to keep, this code can end up looking like this:
+{{{
+32000  DATA "COUT    EQU $FDED"
+32010  DATA    "CR      EQU $FC62"
+32020  DATA  "        LDX #0"
+}}}
+The spacing after the DATA statement isn't consistent across the line.  This happens because BASIC's LIST command will
+always place a space character after the DATA keyword and then it displays the rest of the line, with exactly the same
+whitespace as input by the user.  In the first example you will notice that the LISTing shows only a single space
+between the DATA keyword and the opening quotation mark.  When I typed that code in, I didn't actually place any spaces
+at all between the DATA keyword and the opening quote.  I ran them together but Applesoft was still able to interpret it
+correctly.  Now the problem comes if I use the cursor trace editing feature to modify a line and I scan over that space
+in the LISTing between the DATA keyword and quote.  This will add a space to the code where I didn't actually have one
+before.  If I forget to skip these leading spaces during my cursor scan then I will keep accumulating the one that the
+LIST command appends to the DATA keyword.  My code updating steps described 
+[[https://github.com/adamgreen/Retrochallenge-2013SC#updating-hellobas | here]]
+also cause these extra spaces to be accumulated for similar reasons.
+
+To solve this problem I wrote DSPACE in 6502 assembly language using my simple Applesoft BASIC based assembler.  This
+utility walks through the currently loaded BASIC program in tokenized format and compresses the code to remove these
+extra spaces.
+
+===Tokenized Applesoft BASIC Code
+Tokenized Applesoft BASIC programs start at address **$801** in RAM.  Applesoft will then place its variables
+immediately after this code.  The interpreter tracks these addresses with pointers in the zeropage as noted in this
+table:
+|= 16-bit pointer location (little endian) |= Description |
+| $67-$68 | Pointer to beginning of code.  Is $801 for ROM and DOS versions. |
+| $69-$6A | Pointer to start of variables.  This will be 1 or 2 bytes past the end of the code. |
+| $AF-$B0 | Pointer to ending of program.  This will be 1 or 2 bytes past the end of the code. |
+
+The lowest numbered line in your program can be found at address **$801** and the lines are stored in ascending order by
+line number.  DSPACE can start by looking at the first line of code found at this address.  This line and all of the
+others begin with a 4-byte header.  This header contain the following fields:
+|= Byte Offsets |= Description |
+| 0 - 1 | 16-bit Link Address.  Points to address to header of next line.  Stored in little endian order. |
+| 2 - 3 | 16-bit Line Number.  Stored in little endian order. |
+
+While DSPACE can just ignore the line number field, it must use the link field to walk through each line of the program
+by walking through its singly linked list of lines.  **Note:** Not only will DSPACE read these link fields, it will have
+to modify them if they point to lines which have been moved because of whitespace elimination.
+
+Between the line header and the start of the next line (pointed to by the line's link field) the code for the line is
+stored.  It should be noted that this code is stored in tokenized format where each of the Applesoft keywords are
+represented by special single byte values rather than spelled out.  The rest of the code such as numerals, variable
+names, operators, etc, are represented by their human readable ASCII text.  The keyword tokens have their most
+significant bit set.  DSPACE only cares about one keyword, DATA:
+|= Keyword |= Token Value |
+| DATA | $83 |
+A 0 is always stored in the last byte of a tokenized line to let the interpreter know that the end of line has been
+encountered as it scans through executing the statements in a line of BASIC code.
+
+This is an example of a tokenized line from an Applesoft BASIC program:
+{{{
+3B 08 1E 00 83 20 22 4F 4E 45 20 53 50 41 43 45  22 00
+}}}
+It corresponds to this line of BASIC code:
+{{{
+30  DATA "ONE SPACE"
+}}}
+
+The first two bytes, **$3B** and **$08**, form the link address which indicates that the next line starts at an address of **$083B**.\\
+The next two bytes, **$1E** and **$00**, form the line number of **$001E**, or 30 in decimal.\\
+The actual code starts at the 5th byte.  This first byte has a value of **$83**, which is the DATA keyword.\\
+The 6th byte is a space character, with an ASCII value of **$20**.  It is these spaces which we want to remove.\\
+Note that the last byte of the line is the **$00** end of line terminator.
+
+DSPACE just walks through the lines of BASIC code using the link fields and for each line checks to see if the first
+byte of code is the DATA keyword token, **$83**, followed by at least one space character, **$20**.  If so, it will move
+all of the code (for this line and all subsequent lines) down in memory to overwrite the unwanted space characters.  It
+needs to note how much it has moved the code around so that it can update the following:
+* The link fields of the first line to have spaces removed and all subsequent lines will need to be decreased to account
+  for the code downward movement in RAM.
+* The program end pointer in the zero page, **$AF-$B0**, should be moved down to let Applesoft know that the program now
+  uses less memory.  The start of variables pointer in the zero page, **$69-$6A**, should be updated for the same
+  reason.
+
+The code for DSPACE can be found
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/files/DSPACE.BAS#L295 | here]].
