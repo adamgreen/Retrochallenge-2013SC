@@ -4,6 +4,26 @@ I have met my initial Retrochallenge 2013 goals and I am now working through rev
 [[https://github.com/adamgreen/Retrochallenge-2013SC#july-15th-2013---feature-complete-at-the-halfway-mark | Read more...]]
 
 
+==July 20th, 2013 - New Features and Utilities
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130720-01.jpg}}
+
+I have been using the assembler over the last couple of days to write a 6502 assembly language sample which experiments
+with the ProDOS MLI (Machine Language Interface) to interact with the floppy drive.  As I was working on that sample, I
+encountered a few issues with both my assembler and Applesoft BASIC.  I decided that I should do something about them.
+To that end I worked on the following items since my last post:
+* My assembler should provide the byte and error counts after dumping the symbol table, not before.  This allows me to
+  walk away from the computer during a build and still know whether it was successful or not when I come back.
+* ASC directive should have an option to place ASCII strings in the machine code with the most significant bit set
+  (negative ASCII) since many of the Apple II monitor APIs require this format.  I would have liked to use the quotation
+  mark as an operand delimiter for this feature but getting that to work in DATA strings was too difficult.  Instead I
+  used the back quote (`) as the delimiter to indicate that negative ASCII should be used.
+* Write a utility to remove leading white space that ends up in the DATA statements of my BASIC code.  I wrote this
+  utility in 6502 assembly language using my assembler.  It is able to run over and modify the tokenized BASIC program
+  already loaded in RAM.
+  [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/dspace.creole#dspace---my-first-6502-utility | Read more...]]
+
+
 ==July 17th, 2013 - J is No Longer Missing in Action
 
 I took my Apple IIe apart last night to take a look at my J key issue.  I never figured out how to get access to the
