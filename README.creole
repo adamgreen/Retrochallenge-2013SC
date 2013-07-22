@@ -4,6 +4,150 @@ I have met my initial Retrochallenge 2013 goals and I am now working through rev
 [[https://github.com/adamgreen/Retrochallenge-2013SC#july-15th-2013---feature-complete-at-the-halfway-mark | Read more...]]
 
 
+==July 21st, 2013 - More Performance Work
+
+I spent a little more time today improving the performance of my assembler.  I took some more 
+[[https://github.com/adamgreen/Retrochallenge-2013SC#poor-mans-profiler | "poor man profiling"]] runs and determined
+that the routines used to extract the fields (label, operator, operand, comment) from a line of source code now appeared
+to be the most expensive.
+
+I wondered whether moving these routines to be located in lower numbered lines would improve the runtime by decreasing
+the time spent performing linear searches for their GOSUB/GOTO targets.  The pseudo code for the lines I concentrated on
+were:
+{{{
+extractNextField()
+{
+    // Just return if we have already extracted all of the fields already.
+    if (i == lineLength+1)
+    {
+        retInt = 1;
+        return;
+    }
+    
+    // Check for comment.
+    tempString = MID$(lineText, i, 1);
+    if (tempString == ";")
+    {
+        comment = MID$(lineText, i);
+        retInt = 1;
+        return;
+    }
+
+    // Find end of this field.
+    if (tempString == "'" || tempString == "`")
+    {
+        // Extract delimited string.
+        findEndOfString();
+        j++;
+    }
+    else
+    {
+        // Extract whitespace delimited field.
+        findNextWhitespace();
+    }
+    tempString = MID$(lineText, i, j-i);
+    i = j;
+    
+    // Advance to start of next field.
+    findNextNonWhitespace();
+    i = j;
+    
+    retInt = 0;
+    return;
+}
+
+findEndOfString()
+{
+    j = i+1;
+    while (j <= lineLength)
+    {
+        if (MID$(lineText,j,1) == tempString)
+            return;
+        j++;
+    }
+}
+
+findNextWhitespace()
+{
+    j = i;
+    while (j <= lineLength)
+    {
+        if (MID$(lineText,j,1) == " ")
+            return;
+        j++;
+    }
+}
+
+findNextNonWhitespace()
+{
+    j = i;
+    while (j <= lineLength)
+    {
+        if (MID$(lineText,j,1) != " ")
+            return;
+        j++;
+    }
+}
+}}}
+
+My original BASIC code for these routines was as follows (where line 3300 corresponds to extractNextField, line 3400
+corresponds to findNextWhitespace, line 3500 corresponds to findNextNonWhitespace, and line 10300 corresponds to
+findEndOfString):
+{{{
+3300  IF I = A% +1  THEN R% = 1: RETURN 
+3310 T$ =  MID$ (A$,I,1): IF T$ = ";"  THEN C$ =  MID$ (A$,I):R% = 1: RETURN 
+3320  IF T$ = "'"  OR T$ = "`"  THEN  GOSUB 10300:K = K +1: GOTO 3340
+3330  GOSUB 3400
+3340 T$ =  MID$ (A$,I,K -I):I = K: GOSUB 3500:I = K:R% = 0: RETURN 
+
+3400 K = I
+3410  IF K >A%  THEN  RETURN 
+3420  IF  MID$ (A$,K,1) = " "  THEN  RETURN 
+3430 K = K +1: GOTO 3410
+
+3500 K = I
+3510  IF K >A%  THEN  RETURN 
+3520  IF  MID$ (A$,K,1) < >" "  THEN  RETURN 
+3530 K = K +1: GOTO 3510
+
+10300 K = I +1
+10310  IF K >A%  THEN  RETURN 
+10320  IF  MID$ (A$,K,1) = T$  THEN  RETURN 
+10330 K = K +1: GOTO 10310
+}}}
+
+I pulled the extractNextField() function down to line 10 to improve Applesoft GOTO/GOSUB target resolution.  I also
+further optimized this function by inlining the 3 other routines since they were only called from this single function.
+The new version of its BASIC code looks like this:
+{{{
+10  IF I = A% +1  THEN R% = 1: RETURN 
+11 T$ =  MID$ (A$,I,1): IF T$ = ";"  THEN C$ =  MID$ (A$,I):R% = 1: RETURN 
+12  IF T$ < >"'"  AND T$ < >"`"  THEN 17
+13 K = I +1
+14  IF K >A%  THEN K = K +1: GOTO 21
+15  IF  MID$ (A$,K,1) = T$  THEN K = K +1: GOTO 21
+16 K = K +1: GOTO 14
+17 K = I
+18  IF K >A%  THEN 21
+19  IF  MID$ (A$,K,1) = " "  THEN 21
+20 K = K +1: GOTO 18
+21 T$ =  MID$ (A$,I,K -I):I = K:R% = 0
+22  IF I >A%  THEN  RETURN 
+23  IF  MID$ (A$,I,1) < >" "  THEN  RETURN 
+24 I = I +1: GOTO 22
+}}}
+
+These changes resulted in a 5% runtime improvement.  I got another 1% improvement in runtime by using early
+initialization on the variables used by this code.  When this hot field extraction code runs, Applesoft uses a linear
+search of the variable table to resolve its variable references.  Initializing these variables early allows them to be
+found more quickly via linear search.
+{{{
+2300 I = 0:K = 0:A% = 0:A$ = "":T$ = "":R% = 0
+}}}
+
+[[https://github.com/adamgreen/Retrochallenge-2013SC/commit/e5f0530a0c0ec4fbf1aa7b95b53d6ac82a6dadd3 | Read more in today's performance commit...]]
+
+
 ==July 20th, 2013 - New Features and Utilities
 
 {{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130720-01.jpg}}
