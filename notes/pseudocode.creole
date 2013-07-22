@@ -218,6 +218,14 @@ getCurrentDataLocations()
 
 initVariables()
 {
+    // Initialize hot variables first.
+    i = 0;
+    j = 0;
+    lineLength = 0;
+    lineText = "";
+    tempString = "";
+    retInt = 0;
+    
     // Initialize integers.
     listFlag = 1;
     testFlag = 0;

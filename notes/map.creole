@@ -1,5 +1,6 @@
 == BASIC Line Number to Function Name Mapping
 |= BASIC Line |= Function Implemented |
+| 10 | extractNextField, findNextWhitespace, findNextNonWhitespace, findEndOfString |
 | 2000 | main |
 | 2100 | init |
 | 2200 | reserveMemoryForMachineCode |
@@ -13,9 +14,9 @@
 | 3000 | fetchAndSplitNextLine |
 | 3100 | freeUnneededStrings |
 | 3200 | restoreDataLocations |
-| 3300 | extractNextField |
-| 3400 | findNextWhitespace |
-| 3500 | findNextNonWhitespace |
+| 3300 | //deleted// |
+| 3400 | //deleted// |
+| 3500 | //deleted// |
 | 3600 | printLineNumber |
 | 3700 | parseLine |
 | 3800 | parseCommentForTestBytes |
@@ -83,7 +84,7 @@
 | 10000 | signalTestFailure |
 | 10100 | printSummary |
 | 10200 | print4DigitHexValue |
-| 10300 | findEndOfString |
+| 10300 | //deleted// |
 | 10400 | populateOpcodeTableEntries |
 
 
