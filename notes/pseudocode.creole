@@ -6,7 +6,7 @@ What follows is the current pseudo code for my simple 6502 assembler.  It is a w
 // Constants
 const uint16_t expectedHiMem = 0x9600;      // DOS should be located above this address.
 const uint16_t dosBufferSize = 1024;        // ProDOS keeps 1k of buffers just above HIMEM.
-const uint16_t machineCodeReserve = 0x7600; // Start of the area to be reserved for our machine code and ProDOS buffers.
+const uint16_t machineCodeReserve = 0x8C00; // Start of the area to be reserved for our machine code and ProDOS buffers.
 const int16_t  testQueueStart = machineCodeReserve + dosBufferSize;      // Use 1 page of reserve for test queue.
 const int16_t  testQueueSize = 256;
 const int16_t  testQueueEnd = testQueueStart + testQueueSize - 1;
