@@ -4,6 +4,12 @@ I have met my initial Retrochallenge 2013 goals and I am now working through rev
 [[https://github.com/adamgreen/Retrochallenge-2013SC#july-15th-2013---feature-complete-at-the-halfway-mark | Read more...]]
 
 
+==July 27th, 2013 - In the Home Stretch
+
+With 5 days left to go in the Retrochallenge I continue to make progress and I am now in the home stretch.  I will have
+more to log about my retro project progress as I near the finale of the challenge.  The fun continues...
+
+
 ==July 21st, 2013 - More Performance Work
 
 I spent a little more time today improving the performance of my assembler.  I took some more 
