@@ -1,0 +1,23 @@
+==Overview
+
+These notes provide an overview of the analog joystick that I built for my Apple IIe.  It provides 2 analog axis and a
+single push button.  I would have wired in two push buttons but the easiest multi-conductor for me to obtain locally was
+phone cable which contains 4 stranded conductors: 2 for the pots, 1 for +5V, leaving only one conductor for a push
+button.  Luckily only one button is required for playing Jordan Mechner's Prince of Persia!
+
+==Bill of Materials
+|= Part |
+| [[https://www.sparkfun.com/products/9032 | Thumb Joystick]] |
+| [[http://www.radioshack.com/product/index.jsp?productId=2102497 | 9-Position Male D-Sub Connector]] |
+| [[http://www.radioshack.com/product/index.jsp?productId=2103993 | D-Sub Connector Hood]] |
+| [[http://www.radioshack.com/product/index.jsp?productId=2049718 | SPDT Submini Lever Switch]] |
+| [[http://www.makershed.com/product_p/mstin1.htm | Candy/Altoids Tin]] |
+| [[http://www.radioshack.com/product/index.jsp?productId=2049729 | 4-conductor Phone Cable]] |
+
+==Wiring Notes
+
+|= DB-9 Pin Number |= Signal Name |=  Wire Colour |= Description |
+| 2                | +5V          | Yellow        |              |
+| 5                | GC0          | Black         | X Axis       |
+| 7                | PB0          | Green         | Push Button  |
+| 8                | GC1          | Red           | Y Axis       |
