@@ -1,7 +1,105 @@
-==Initial Challenge Goals Met
-I have met my initial Retrochallenge 2013 goals and I am now working through revised goals for the rest of July.
+==July 31st, 2013 - Prince of Persia Lives...
 
-[[https://github.com/adamgreen/Retrochallenge-2013SC#july-15th-2013---feature-complete-at-the-halfway-mark | Read more...]]
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130730-01.jpg}}
+
+on my actual Apple IIe hardware.  When [[http://jordanmechner.com | Jordan Mechner]] found and released the original
+Apple II assembly language source code for his Prince of Persia game 
+[[https://github.com/jmechner/Prince-of-Persia-Apple-II | on github last year]], I wanted to build it myself and play it
+on actual hardware.  To that end, I purchased an Apple IIe platinum edition on Ebay and started working on the build
+system.  Earlier this year, 
+[[https://github.com/adamgreen/Prince-of-Persia-Apple-II/blob/build/Notes/pop-build.creole#quick-start | I completed the build system]]
+but I still wasn't able to play it on my actual hardware.  The problem was that I could generate a low level nibble disk
+image that would work under emulation but I couldn't use standard tools like [[http://adtpro.sourceforge.net | ADTPro]]
+to copy that image to an actual 5.25" floppy disk.  **Getting Prince of Persia to run on my Apple IIe is my final
+Retrochallenge goal**  To achieve this goal, I used the 6502 assembler that I already wrote for this challenge to
+facilitate the building of 
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/files/POPWRITE.BAS | POPWRITE]].
+
+POPWRITE runs on my actual Apple IIe hardware, reads in the Prince of Persia nibble images, and uses low level disk
+access to write them to 5.25" floppy disk.  To make this possible, I take advantage of two other existing tools: 
+[[http://adtpro.sourceforge.net/vdrive.html | ADTPro Virtual Drive]] and 
+[[http://applecommander.sourceforge.net | AppleCommander]].  These tools are used to create a 800K 3.5" floppy disk
+image containing the nibble image for sides A and B of the Prince of Persia diskette and then virtually mount it on my
+Apple IIe.  I borrowed low level disk code from Roland Gustafsson's RW18 routines and Don Worth/Pieter Lechner's
+[[http://www.amazon.com/Beneath-Apple-Prodos-Don-Worth/dp/0835904636 | Beneath Apple ProDOS]] sample code
+
+===More Joy With Stick
+
+Once I had Prince of Persia running on my Apple IIe, I found that playing the game with the keyboard to be a bit
+cumbersome.  I would have preferred to play the game using a joystick but I didn't have one that worked with my
+Apple IIe.  I therefore decided that hacking together one would make a good addition to this Retrochallenge 2013 entry.
+My hack is based around a [[https://www.sparkfun.com/products/9032 | thumb joystick from Sparkfun]] that I already had
+in my parts bin from a previous project.  I added a few parts from my local Radio Shack and ended up with this:
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130730-02.jpg}}
+
+It makes playing Prince of Persia much more enjoyable.  You can 
+[[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/notes/joystick.creole#overview | click here]] to learn
+more about how I built this controller.
+
+===Final Goal Results:
+* Have Fun.
+** This was my first Retrochallenge attempt and I really enjoyed it.
+** It felt great to dedicate a healthy chunk of time to working with a great piece of retrocomputing gear like the
+   Apple II.
+** I will definitely participate again in the future.
+* Learn more about programming my Apple ][e.
+** I learned the basics of how to write and debug Applesoft code on the Apple II.
+** I even learned a bit about performance tweaking of such Applesoft code.
+** I also learned the basics of how to write 6502 assembly language programs for the Apple II.
+** I augmented my existing low level Apple II disk format knowledge by actually developing an assembly language program
+   that could write low level nibble disk images to an actual 5.25" floppy disk.
+* Write a simple 6502 assembler in Applesoft BASIC.
+** I completed the writing of the 6502 assembler in Applesoft BASIC by mid-July.
+** I spent the rest of the month writing a couple of Apple II utilities in 6502 assembly language to put this assembler
+   through its paces.
+** **Needs Improvement:**
+*** Performance: The assembler is still a bit too slow.  I may continue the Apple IIe development environment
+    bootstrapping process in the future by reimplementing part or all of this assembler in 6502 assembly language.
+*** Operators in Expressions: The assembler doesn't currently support any operators in operand expressions.  It would be
+    better if it at least supported the '+' and '-' operators.
+* Actually write the code on my Apple IIe and only switch to an emulator if something should break on the real hardware
+  during the challenge timeframe.
+** I only used the actual Apple IIe during the first 3 weeks of this challenge.
+** **Emulator Usage:** I did switch to using the Virtual II emulator during the last week so that I could run the
+   assembler 25 times faster.  This helped to work around the performance issue and allowed the PoP nibble writer utility
+   to be written and tested in a timely fashion.  The emulator also has superior debugging abilities.
+* Read 6502 assembly language source code from DATA statements appended to the end of the assembler program.
+** Yep, that is how it works!
+* Output human readable listing output to the screen as part of the assembly process.
+** Yep, it does that too!
+* Output a BLOADable program to a ProDOS file.
+** Yep, it does this as well!
+* Attempt to fix the **J** key on my Apple IIe keyboard.
+** Done.  I just had to reflow the solder on the switch for the **J** key to get it working.
+* Write actual 6502 assembly language programs using my assembler.
+** [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/files/DSPACE.BAS | DSPACE:]]  I wrote this utility
+   to run through a tokenized Applesoft program loaded into memory to remove extraneous leading spaces in DATA statements.
+** [[https://github.com/adamgreen/Retrochallenge-2013SC/blob/master/files/POPWRITE.BAS | POPWRITE:]] I wrote this
+   utility to create an actual 5.25" floppy disk for Prince of Persia that I could play on my Apple II.
+* Improve performance of assembler enough to make previous goal tolerable.
+** I did make the assembler 60% faster by switching the opcode table lookup to use a binary search instead of the
+   original linear search.
+** I also performed some Applesoft optimizations on a couple of the hot subroutines used for parsing the lines of
+    assembly language source to get another 5% improvement.
+** **Future Improvement:** Take advantage of the current Applesoft BASIC based assembler to improve itself by
+   re-implementing part or all of the assembler in 6502 assembly language.
+* **Extra Credit:**
+** Got Prince of Persia to run on my actual Apple IIe hardware.
+** Built a functional game controller for my Apple IIe.
+
+===Books Referenced for this Retrochallenge
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130730-03.jpg}}
+
+[[http://www.amazon.com/Beneath-Apple-Prodos-Don-Worth/dp/0835904636 | Beneath Apple ProDOS by Don Worth and Pieter Lechner]] \\
+[[http://www.amazon.com/The-Computer-Controller-Cookbook-Riley/dp/0916688453 | The Computer Controller Cookbook by Tom and Kelda Riley]]\\
+[[http://www.amazon.com/Inside-Apple-IIE-Gary-Little/dp/0893035513 | Inside the Apple IIe by Gary B. Little]] \\
+[[http://www.amazon.com/The-New-Apple-Users-Guide/dp/0615639879 | The New Apple II User's Guide by David Finnigan]] \\
+
+=== Final Comments
+I had a great time working on my Retrochallenge project and reading about the other entrant's great projects.  There are
+so many great Retrochallenge projects!  I don't stand a chance!
 
 
 ==July 27th, 2013 - In the Home Stretch
