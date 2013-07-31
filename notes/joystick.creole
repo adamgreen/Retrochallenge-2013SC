@@ -1,9 +1,11 @@
 ==Overview
 
-These notes provide an overview of the analog joystick controller that I built for my Apple IIe.  It provides 2 analog axis and a
-single push button.  I would have wired in two push buttons but the easiest multi-conductor for me to obtain locally was
-phone cable which contains 4 stranded conductors: 2 for the pots, 1 for +5V, leaving only 1 conductor for a push
-button.  Luckily only one button is required for playing Jordan Mechner's Prince of Persia!
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130730-02.jpg}}
+
+These notes provide an overview of the analog joystick controller that I built for my Apple IIe.  It provides 2 analog
+axis and a single push button.  I would have wired in two push buttons but the easiest multi-conductor for me to obtain
+locally was phone cable which contains 4 stranded conductors: 2 for the pots, 1 for +5V, leaving only 1 conductor for a
+push button.  Luckily only one button is required for playing Jordan Mechner's Prince of Persia!
 
 ==Bill of Materials
 |= Part |
@@ -14,12 +16,14 @@ button.  Luckily only one button is required for playing Jordan Mechner's Prince
 | [[http://www.makershed.com/product_p/mstin1.htm | Candy/Altoids Tin]] |
 | [[http://www.radioshack.com/product/index.jsp?productId=2049729 | 4-conductor Phone Cable]] |
 
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/joystick-01.jpg}}
+
 ==Wiring Notes
 
-The Apple IIe has an internal game DIP port which exposes all of the game I/O signals and an external DB-9 female which
-exposes a subset of those signals.  This joystick will utilize the external DB-9 connector since it has the 5 signals
-required and it makes it easier for the user to connect/disconnect the controller.  The following table provides an
-overview of the 5 signals used by this controller and to which pin each of the 4 coloured wires in the phone cable is
+The Apple IIe has an internal DIP port which exposes all of the game I/O signals and an external DB-9 female connector
+which exposes a subset of those signals.  This joystick will utilize the external DB-9 connector since it has the 5
+signals required and it makes it easier for the user to connect/disconnect the controller.  The following table provides
+an overview of the 5 signals used by this controller and to which pin each of the 4 coloured wires in the phone cable is
 connected:
 
 |= DB-9 Pin Number |= Signal Name |=  Wire Colour |= Description |
@@ -31,8 +35,8 @@ connected:
 
 ==Less Resistance - More Capacitance
 The Apple II joysticks contain a 150k ohm potentiometer while the Apple IIe itself contains a fixed 0.022uF capacitor.
-These are used together to determine the current position, resistance, by measuring the resulting RC charge time.  My
-thumb joysticks only contain a 10k ohm potentiometer.  To obtain a comparable RC charge time range, I need to increase
+These are used together to determine the current position, ie. resistance, by measuring the resulting RC charge time.
+My thumb joysticks only contain a 10k ohm potentiometer.  To obtain a comparable RC charge time, I need to increase
 the capacitance for use with this joystick.
 
 **150k ohm x  0.022uF = 3.3 msec** \\
@@ -41,11 +45,56 @@ the capacitance for use with this joystick.
 
 I have soldered an additional 0.3uF between GC0 and GND to correct for the joystick's lower resistance.  The same was
 done for GC1 and GND as well.  To accomplish this, I soldered together two sets of three 0.1 uF ceramic capacitors (in
-parallel) and added them between the correct pins within the DB-9 connector itself.  By wiring in the extra passives
-here, I don't need to bring the ground signal all the way up to the controller.
+parallel) and added them between the correct pins within the DB-9 connector itself.
 
 ==Switching - What a Downer
-From what I have read, Apple II controllers typically contain a 500 ohm pull down resistor on their switch inputs so
+Apple II controllers typically contain a 500 ohm pull down resistor on their switch inputs so
 that they read a low voltage level when not pressed.  For my controller, I have soldered a 1k ohm pull down resistor
 between the PB0 and GND pins within the DB-9 connector itself.  The switch in the controller will connect the PB0 signal
 to +5V when it is pressed.
+
+==Mechanical Build
+The non-electrical build started with drilling out some holes in my candy tin.  I started by holding the tin in my hand
+to see where I would find it most comfortable to mount the thumb joystick and lever switch.  I marked these locations
+and then headed to the drill press.  I used a 7/8" hole saw to cut out the hole for the thumb joystick in the cover of
+the tin.  //If I was doing this again, I would use a 1" hole saw instead to give the stick a little more clearance.//
+I then drilled a few holes in the location where I wanted to mount the lever switch in the back of the tin.  I used
+these holes as simple access locations so that I could use a file to perform the actual shaping of the final switch
+hole.  I drilled one more hole in the back corner of the tin to allow the cable to enter.  I used both a de-burring tool
+and a round file to smooth out the newly cut edges in the candy tin.
+
+To make it easier to mount the thumb joystick in the tin, I bent the potentiometer and mounting pins of the joystick out
+at 90 degrees.  I then filed off the pins for the joystick's microswitch.  This made it easy to mount the joystick to a
+flat surface using hot glue.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/joystick-02.jpg}}
+
+I used hot glue to mount the lever switch and thumb joystick in the tin.  I did need to elevate the thumb joystick a bit
+so I placed a scrap piece of 1/4" plywood between the bottom of the joystick and the tin.
+
+I was worried that the cable might get cut by the edges of the hole in the candy tin, so I cut this hole a big larger
+than needed and lined it with some string.  I used lots of hot glue on the inside of the tin to hold the cable in place.
+I wrapped string around the cable as it first leaves the tin to act as a strain relief.  This string is held in place
+with a small amount of hot glue as well.
+
+==DB-9 Connector Wiring
+I actually crammed quite a few passives into the DB-9 connector itself.  The advantage of doing this was that I didn't
+need to bring the ground signal all the way up to the controller.  The disadvantage was that fitting it all in was a
+pain.  I soldered a 100k ohm resistor between pin 3 (ground) and pin 7 (push button 0).  I also needed 0.3uF of
+capacitance between the analog axis inputs (pins 5 and 8) and ground.  This was the hard part since I needed to use
+three 0.1uF capacitors wired in parallel to obtain the required 0.3uF and I didn't have small 0.1uF capacitors kicking
+around.  This means that I needed to fit a total of six 0.1uF capacitors into the DB-9 connector.  If I had had more
+time, I would have ordered some surface capacitors for this part of the build.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/joystick-03.jpg}}
+
+==Controller Wiring
+The last thing to wire up was the components inside of the candy tin itself.  The yellow wire which carries the +5V
+signal needed to be routed to the common pin on the lever switch and to each of the two potentiometers in the thumb
+joystick.  There are 3 pins on each of these potentiometers.  I wired the +5V signal to the pin closest to the side
+which should be represented by a value of 0 for that axis (left for the horizontal pot and top for the vertical pot).
+I then wired the red wire (vertical axis) to the bottom two pins of the vertical pot.  The black wire (horizontal axis)
+was wired to the two rightmost pins of the horizontal pot.  The last wire to be soldered in was the green wire going to
+the normally open pin of the lever switch.
+
+{{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/joystick-04.jpg}}
