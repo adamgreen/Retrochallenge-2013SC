@@ -1,3 +1,15 @@
+The Retrochallenge 2013 Summer Challenge results are in and can be found 
+[[http://www.wickensonline.co.uk/retrochallenge-2012sc/ | here!]]  The winner was
+[[http://www.loomcom.com/blog/ | Twylo's cool project]] to convert his retro VT100 keyboard into a USB HID keyboard
+device that could be connected to his modern Macintosh.  I will have to step up my game for the next challenge if I even
+want to make it to the runners up list :)
+
+Congratulations to all of the winners and thanks to the organizers for pulling together the challenge and doing the hard
+work of judging all of those great entries.  Well done!
+
+I look forward to next year's challenge!
+
+
 ==July 31st, 2013 - Prince of Persia Lives...
 
 {{https://raw.github.com/adamgreen/Retrochallenge-2013SC/master/photos/rc2013sc-20130730-01.jpg}}
